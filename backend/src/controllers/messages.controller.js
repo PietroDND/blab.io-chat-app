@@ -45,7 +45,7 @@ export const getMessages = async (req, res) => {
             return res.status(404).json({ msg: 'Chat not found' });
         }
 
-        if (!chat.users.includes(currentUserId)) {
+        if (!chat.users.some(user => user.toString() === currentUserId.toString())) {
             return res.status(403).json({ msg: 'Access denied. You are not part of this chat.' });
         }
 

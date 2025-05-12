@@ -3,30 +3,60 @@ import Chat from '../models/chat.model.js';
 
 export const getOrCreateChat = async (req, res, next) => {
     try {
-        const recipientId = mongoose.Types.ObjectId.createFromHexString(req.body.recipientId);
+        let users = [...req.body.users];
         const currentUserId = req.user._id;
 
-        console.log('Looking for chat with users:', currentUserId, recipientId);
-
-        if (!recipientId) {
-            return res.status(400).json({ msg: 'recipientId is required' });
+        if (!users || users.length === 0) {
+            return res.status(400).json({ msg: 'Users are required to create/get a chat' });
         }
 
-        //Find existing one-on-one chat
-        let chat = await Chat.findOne({
+        if (!users.includes(currentUserId)) {
+            users.push(currentUserId);
+        }
+
+        //Check that every user is in valid ObjectId format
+        for (const userId of users) {
+            if (!mongoose.Types.ObjectId.isValid(userId)) {
+                return res.status(400).json({ msg: 'Invalid userId format' });
+            }
+        }
+
+        let chat;
+
+        //Case 1-on-1 chat (2 users)
+        if (users.length === 2) {
+            chat = await Chat.findOne({
             isGroupChat: false,
-            users: { $all: [recipientId, currentUserId], $size: 2 }
-        });
-        console.log('Found chat: ', chat);
-        
-        if (!chat) {
-            console.log('Enter create chat');
-            chat = await Chat.create({
-                users: [currentUserId, recipientId],
-                isGroupChat: false
+            users: { $all: users, $size: 2 }
             });
+        
+            if (!chat) {
+                chat = await Chat.create({
+                    users,
+                    isGroupChat: false
+                });
+            }
+
+            await chat.populate('users', '-password');
         }
-        await chat.populate('users', '-password');
+
+        if (users.length > 2) {
+            chat = await Chat.findOne({
+                isGroupChat: true,
+                users: { $all: users, $size: users.length }
+            });
+
+            if (!chat) {
+                chat = await Chat.create({
+                    users,
+                    isGroupChat: true,
+                    groupAdmin: currentUserId
+                });
+            }
+
+            await chat.populate('users', '-password');
+        }
+
         req.chat = chat;
         next();
 
