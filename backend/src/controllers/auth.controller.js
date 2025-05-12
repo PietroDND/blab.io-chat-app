@@ -1,6 +1,7 @@
 import { generateToken } from "../lib/utils.js";
 import bcrypt from 'bcryptjs';
 import User from "../models/user.model.js";
+import cloudinary from '../lib/cloudinary.js';
 
 export const signup = async (req, res) => {
     const { username, fullname, email, password } = req.body;
@@ -61,12 +62,12 @@ export const login = async (req, res) => {
             $or: [{ email: emailOrUsername }, { username: emailOrUsername }]
         });
         if (!user) {
-            return res.status(400).json({ message: "Invalid email or username" });
+            return res.status(400).json({ msg: "Invalid email or username" });
         }
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
         if (!isPasswordCorrect) {
-            return res.status(400).json({ message: "Invalid password" });
+            return res.status(400).json({ msg: "Invalid password" });
         }
 
         generateToken(user._id, res);
@@ -80,17 +81,17 @@ export const login = async (req, res) => {
         });
     } catch (error) {
         console.log("Error in login controller", error.message);
-        res.status(500).json({ message: "Internal Server Error" });
+        res.status(500).json({ msg: "Internal Server Error" });
     }
 };
 
 export const logout = (req, res) => {
   try {
     res.cookie("blab.io_authToken", "", { maxAge: 0 });
-    res.status(200).json({ message: "Logged out successfully" });
+    res.status(200).json({ msg: "Logged out successfully" });
   } catch (error) {
     console.log("Error in logout controller", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ msg: "Internal Server Error" });
   }
 };
 
@@ -119,7 +120,7 @@ export const updateProfile = async (req, res) => {
         }
 
         if (!username && !profilePic) {
-          return res.status(400).json({ msg: 'No data provided to update' });
+          return res.status(400).json({ msg: 'No data provided' });
         }
 
         const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });

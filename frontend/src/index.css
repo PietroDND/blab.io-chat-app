@@ -1,5 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 @import "tailwindcss";
+@plugin "daisyui" {
+    themes: light --default, dark --prefersdark;
+}
+
+@plugin "daisyui/theme" {
+    name: "dark";
+    --color-primary: #1d70b8;
+}
+
+@plugin "daisyui/theme" {
+    name: "light";
+    default: true;
+    --color-primary: #1d70b8;
+}
+  
+
+:root {
+    --main-blue-1: #588ec5;
+    --main-blue-2: #1d70b8;
+}
 
 * {
     font-family: "Outfit", sans-serif;
