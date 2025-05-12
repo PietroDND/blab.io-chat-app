@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useAuthStore } from '../stores/authStore'
-import { Camera, User, Mail, SquarePen } from 'lucide-react';
+import { Camera, User, Mail, SquarePen, CircleX } from 'lucide-react';
+import { formatDate } from '../utils/formatDate';
 
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
@@ -56,7 +57,7 @@ const ProfilePage = () => {
               <img
                 src={selectedImage || authUser.profilePic || "/avatar.png"}
                 alt="Profile"
-                className="size-32 rounded-full object-cover border-4 "
+                className="size-32 rounded-full object-cover border-4"
               />
               <label
                 htmlFor="avatar-upload"
@@ -88,7 +89,7 @@ const ProfilePage = () => {
             <label htmlFor="username" className="label mb-1">
               <span className='label-text font-medium'>Username</span>
             </label>
-            <div className="relative">
+            <div className={`relative ${errorMsg.length > 0 ? 'mb-0' : ''}`}>
               <input 
                 type='text'
                 id='username'
@@ -97,37 +98,33 @@ const ProfilePage = () => {
                 onChange={handleUsernameChange}
                 disabled={!isEditingUsername}
               />
+              {isEditingUsername && (
+                <div className='absolute inset-y-0 right-12 flex items-center'>
+                  <button 
+                    className="btn btn-success h-7" 
+                    onClick={handleSaveUsername}
+                    disabled={newUsername === authUser.username || isUpdatingProfile}
+                  >
+                    Save
+                  </button>
+                </div>
+              )}
               <button
                 type='button'
                 className='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer z-10'
                 onClick={() => {
                   setIsEditingUsername(!isEditingUsername);
                   setNewUsername(authUser.username);
+                  setErrorMsg('');
                 }}
               >
-                <SquarePen className='size-5 text-base-content/40' />
+                {!isEditingUsername ? (
+                  <SquarePen className='size-5' />
+                ) : (
+                  <CircleX className='size-5 text-red-500' />
+                )}
               </button>
             </div>
-            {isEditingUsername && (
-              <div className="flex justify-between mt-2">
-                <button 
-                  className="btn btn-primary" 
-                  onClick={handleSaveUsername}
-                  disabled={newUsername === authUser.username || isUpdatingProfile}
-                >
-                  Save
-                </button>
-                <button 
-                  className="btn btn-secondary" 
-                  onClick={() => {
-                    setIsEditingUsername(false);
-                    setNewUsername(authUser.username); // Reset to original username if cancelled
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
             {errorMsg && (
               <p className='text-sm text-red-500 mt-1'>{errorMsg}</p>
             )}
@@ -137,7 +134,7 @@ const ProfilePage = () => {
                 <User className="size-4" />
                 Full Name
               </div>
-              <p className="px-4 py-2.5 bg-base-200 rounded-lg border cursor-not-allowed">{authUser?.fullname}</p>
+              <p className="px-4 py-2.5 bg-base-200 text-gray-400 rounded-lg border cursor-not-allowed">{authUser?.fullname}</p>
             </div>
 
             <div className="space-y-1.5">
@@ -145,7 +142,7 @@ const ProfilePage = () => {
                 <Mail className="size-4" />
                 Email Address
               </div>
-              <p className="px-4 py-2.5 bg-base-200 rounded-lg border cursor-not-allowed">{authUser?.email}</p>
+              <p className="px-4 py-2.5 bg-base-200 text-gray-400 rounded-lg border cursor-not-allowed">{authUser?.email}</p>
             </div>
           </div>
 
@@ -154,7 +151,7 @@ const ProfilePage = () => {
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between py-2 border-b border-zinc-700">
                 <span>Member Since</span>
-                <span>{authUser.createdAt?.split("T")[0]}</span>
+                <span>{formatDate(authUser.createdAt)}</span>
               </div>
               <div className="flex items-center justify-between py-2">
                 <span>Account Status</span>
