@@ -6,6 +6,8 @@ import http from 'http';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.route.js'
 import messageRoutes from './routes/messages.route.js';
+import usersRoutes from './routes/users.route.js';
+import chatsRoutes from './routes/chats.route.js';
 import { connectDB } from './lib/db.js';
 
 dotenv.config();
@@ -26,6 +28,8 @@ app.use(morgan('tiny'));
 //Routes
 app.use('/api/auth', authRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/users", usersRoutes);
+app.use("/api/chats", chatsRoutes);
 
 server.listen(PORT, () => {
     console.log('Server is running on port ', PORT);
