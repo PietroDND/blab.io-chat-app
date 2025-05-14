@@ -62,12 +62,12 @@ export const login = async (req, res) => {
             $or: [{ email: emailOrUsername }, { username: emailOrUsername }]
         });
         if (!user) {
-            return res.status(400).json({ msg: "Invalid email or username" });
+            return res.status(400).json({ msg: "Authentication failed. Please try again." });
         }
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
         if (!isPasswordCorrect) {
-            return res.status(400).json({ msg: "Invalid password" });
+            return res.status(400).json({ msg: "Authentication failed. Please try again." });
         }
 
         generateToken(user._id, res);
@@ -85,10 +85,10 @@ export const login = async (req, res) => {
     }
 };
 
-export const logout = (req, res) => {
+export const logout = (_, res) => {
   try {
     res.cookie("blab.io_authToken", "", { maxAge: 0 });
-    res.status(200).json({ msg: "Logged out successfully" });
+    res.status(200).json({ msg: "Logged out successfully." });
   } catch (error) {
     console.log("Error in logout controller", error.message);
     res.status(500).json({ msg: "Internal Server Error" });
@@ -119,6 +119,9 @@ export const updateProfile = async (req, res) => {
           updateData.profilePic = response.secure_url;
         }
 
+        //Handle profile picture removal
+        if (profilePic === '') updateData.profilePic = '';
+
         if (!username && !profilePic) {
           return res.status(400).json({ msg: 'No data provided' });
         }
@@ -129,7 +132,42 @@ export const updateProfile = async (req, res) => {
   
     } catch (error) {
         console.log('Error while updating profile:', error);
-        res.status(500).json({ msg: 'Internal server error' });
+        res.status(500).json({ msg: 'Internal Server Error' });
+    }
+};
+
+export const updatePassword = async (req, res) => {
+    const { password, newPassword, newPasswordRepeated } = req.body;
+    const userId = req.user._id;
+    
+    try {
+        const user = await User.findById(userId);
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordCorrect) {
+            return res.status(401).json({ msg: 'Current password is incorrect.' });
+        }
+
+        if (newPassword !== newPasswordRepeated) {
+            return res.status(400).json({ msg: 'New passwords do not match.' });
+        }
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({ msg: 'New password must be at least 8 characters long' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const newHashedPassword = await bcrypt.hash(newPassword, salt);
+
+        //Save new password in the database
+        user.password = newHashedPassword;
+        await user.save();
+
+        res.status(200).json({ msg: 'Password changed successfully.' });
+
+    } catch (error) {
+        console.log('Error in updatePassword controlller: ', error.message);
+        res.status(500).json({ msg: "Internal Server Error" });
     }
 };
 
