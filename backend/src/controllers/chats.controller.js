@@ -17,3 +17,12 @@ export const getChats = async (req, res) => {
         res.status(500).json({ msg: 'Failed to fetch chats.' });
     }
 };
+
+export const getGroupChat = (req, res) => {
+    const chat = req.chat;
+    if (!chat) {
+        res.status(500).json({ msg: 'Internal Server Error'});
+    }
+    
+    res.status(201).json(chat);
+};

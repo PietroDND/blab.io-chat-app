@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
 const chatSchema = new mongoose.Schema({
-    name: { type: String }, // Optional for group chats
+    groupName: { type: String }, // Optional for group chats
+    groupPic: { type: String, default: ''}, // Optional for group chats
     isGroupChat: { type: Boolean, default: false },
     users: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     latestMessage: { type: mongoose.Schema.Types.ObjectId, ref: 'Message' },

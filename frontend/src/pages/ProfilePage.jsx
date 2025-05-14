@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useAuthStore } from '../stores/authStore'
 import { Camera, User, Mail, SquarePen, CircleX } from 'lucide-react';
-import { formatDate } from '../utils/formatDate';
+import { formatDate } from '../utils/date';
 
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();

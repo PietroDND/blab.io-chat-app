@@ -4,6 +4,8 @@ import Chat from '../models/chat.model.js';
 export const getOrCreateChat = async (req, res, next) => {
     try {
         let users = [...req.body.users];
+        const groupPic = req.body.groupPic || '';
+        const groupName = req.body.groupName || `${req.user?.username || 'Unknown'}'s Group`;
         const currentUserId = req.user._id;
 
         if (!users || users.length === 0) {
@@ -48,6 +50,8 @@ export const getOrCreateChat = async (req, res, next) => {
 
             if (!chat) {
                 chat = await Chat.create({
+                    groupName,
+                    groupPic,
                     users,
                     isGroupChat: true,
                     groupAdmin: currentUserId

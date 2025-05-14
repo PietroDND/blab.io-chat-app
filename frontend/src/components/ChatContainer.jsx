@@ -7,7 +7,7 @@ const ChatContainer = () => {
   return (
     <div className='w-full'>
       <ChatHeader />
-      <div className='flex'>
+      <div className='flex w-full h-full'>
         <ChatBody />
         <ChatInfo />
       </div>

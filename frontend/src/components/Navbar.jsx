@@ -14,7 +14,7 @@ const Navbar = () => {
         <div className='flex items-center justify-between h-full'>
           <div className='flex items-center gap-8'>
             <Link to='/' className='flex items-center gap-0.5 hover:opacity-80 transition-all'>
-              <div className="size-9 rounded-lg bg-primary/10 flex items-center justify-center">
+              <div className="size-9 flex items-center justify-center">
                 <img src={logo} alt="Blab.io Logo" />
               </div>
               <h1 className="text-3xl font-bold">lab.io</h1>
