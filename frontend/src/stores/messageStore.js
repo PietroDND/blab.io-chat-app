@@ -3,14 +3,18 @@ import toast from 'react-hot-toast';
 import { axiosInstance } from '../lib/axios';
 
 export const useMessageStore = create((set) => ({
-    messages: [],
+    messages: {},
     isMessagesLoading: false,
 
     getMessages: async (chatId) => {
-        set({ isMessagesLoading: true });
+        set((state) => {
+            if (state.messages[chatId]) return {}; // skip setting loading state
+            return { isMessagesLoading: true };
+        });
+
         try {
             const res = await axiosInstance.get(`/chats/${chatId}/messages`);
-            set({ messages: res.data.messages});
+            set((state) => ({ messages: {...state.messages, [chatId]: res.data.messages} }));
         } catch (error) {
             toast.error(error?.response?.data?.msg || 'Failed to fetch messages');
         } finally {

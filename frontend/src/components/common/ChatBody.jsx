@@ -19,8 +19,8 @@ const ChatBody = ({ chatId }) => {
     
     const fetchActiveChat = async () => {
       const chat = await getChatById(chatId);
-      await getMessages(chatId);
       setActiveChat(chat);
+      await getMessages(chatId);
     };
 
     fetchActiveChat();
@@ -40,13 +40,13 @@ const ChatBody = ({ chatId }) => {
     );
   }
 
-  if (isMessagesLoading) {
+  if (isMessagesLoading || !messages[chatId]) {
     return <ChatBodyPlaceholder />
   }
 
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
-    {messages.map((message) => (
+    {messages[chatId].map((message) => (
       <div
         key={message._id}
         className={`chat ${message.senderId._id === authUser._id ? "chat-end" : "chat-start"}`}
