@@ -4,25 +4,10 @@ import { axiosInstance } from '../lib/axios';
 
 export const useChatStore = create((set) => ({
     messages: [],
-    users: [],
     chats: [],
     selectedChat: null,
-    selectedUser: null,
-    isUsersLoading: false,
     isMessagesLoading: false,
     isChatsLoading: false,
-
-    getUsers: async () => {
-        set({ isUsersLoading: true });
-        try {
-            const res = await axiosInstance.get('/users');
-            set({ users: res.data });
-        } catch (error) {
-            toast.error(error.response.data.msg);
-        } finally {
-            set({ isUsersLoading: false });
-        }
-    },
 
     getMessages: async (chatId) => {
         set({ isMessagesLoading: true });
@@ -48,6 +33,14 @@ export const useChatStore = create((set) => ({
         }
     },
 
-    setSelectedUser: (selectedUser) => set({ selectedUser }),
+    getChatById: async (chatId) => {
+        try {
+            const res = await axiosInstance.get(`/chats/${chatId}`);
+            return res.data;
+        } catch (error) {
+            toast.error(error?.response?.data?.msg || `Failed to retrieve chat: ${chatId}`);
+        }
+    },
+
     setSelectedChat: (selectedChat) => set({ selectedChat }),
 }));

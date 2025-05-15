@@ -35,7 +35,7 @@ export const getChatById = async (req, res) => {
     }
 
     try {
-        const chat = await Chat.find({ users: currentUserId, _id: chatId })
+        const chat = await Chat.findOne({ users: currentUserId, _id: chatId })
             .populate('users', 'username profilePic')
             .populate({
                 path: 'latestMessage',

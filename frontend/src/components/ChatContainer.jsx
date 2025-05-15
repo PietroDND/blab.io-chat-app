@@ -2,15 +2,15 @@ import React from 'react'
 import ChatHeader from './common/ChatHeader'
 import ChatBody from './common/ChatBody'
 import ChatInfo from './common/ChatInfo'
+import { useChatStore } from '../stores/chatStore'
 
 const ChatContainer = () => {
+  const { selectedChat } = useChatStore();
+
   return (
-    <div className='w-full'>
+    <div className='w-full h-full flex flex-col'>
       <ChatHeader />
-      <div className='flex w-full h-full'>
-        <ChatBody />
-        <ChatInfo />
-      </div>
+      <ChatBody chatId={selectedChat?._id} />
     </div>
   )
 }

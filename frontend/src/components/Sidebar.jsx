@@ -5,10 +5,12 @@ import { Users, MessageSquareText } from 'lucide-react'
 import { useAuthStore } from '../stores/authStore'
 import { formatChatTimeStamp } from '../utils/date'
 import { getChatName, getChatPic, getMessagePreview } from '../utils/chat'
+import { useUserStore } from '../stores/userStore'
 
 const Sidebar = () => {
-  const { users, getUsers, selectedUser, setSelectedUser, isUsersLoading, chats, selectedChat, setSelectedChat, getChats } = useChatStore();
   const { authUser } = useAuthStore();
+  const { chats, selectedChat, setSelectedChat, getChats } = useChatStore();
+  const { users, selectedUser, setSelectedUser, isUsersLoading, getUsers } = useUserStore();
 
   useEffect(() => {
     getUsers();
@@ -70,7 +72,7 @@ const Sidebar = () => {
               <div className=''>
                 <img 
                   src={getChatPic(chat, authUser)}
-                  alt='Chat image'
+                  alt={`${getChatName(chat, authUser)}'s Avatar`}
                   className='size-12 object-cover rounded-lg'
                 />
               </div>

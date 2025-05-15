@@ -3,9 +3,11 @@ import { getChatName, getChatPic, getMessagePreview } from '../../utils/chat'
 import { useChatStore } from '../../stores/chatStore'
 import { X, Info } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
+import { useUserStore } from '../../stores/userStore';
 
 const ChatHeader = () => {
-  const { selectedUser, setSelectedUser, selectedChat, setSelectedChat } = useChatStore();
+  const { selectedUser, setSelectedUser } = useUserStore();
+  const { selectedChat, setSelectedChat } = useChatStore();
   const { authUser } = useAuthStore();
 
   if (selectedUser && !selectedChat){
@@ -23,7 +25,7 @@ const ChatHeader = () => {
             <div>
               <h3 className="font-medium">{selectedUser.fullname}</h3>
               <p className="text-sm text-base-content/70">
-                Offline
+                {selectedUser.isOnline ? 'Online' : 'Offline'}
               </p>
             </div>
           </div>
@@ -47,7 +49,7 @@ const ChatHeader = () => {
 
             <div className="avatar">
               <div className="size-10 rounded-full relative">
-                <img src={getChatPic(selectedChat, authUser)} alt={`${selectedChat.groupName}'s Avatar`} />
+                <img src={getChatPic(selectedChat, authUser)} alt={`${getChatName(selectedChat, authUser)}'s Avatar`} />
               </div>
             </div>
 
