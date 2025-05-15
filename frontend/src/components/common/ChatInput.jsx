@@ -42,13 +42,11 @@ const ChatInput = ({ chatId }) => {
           if (fileInputRef.current) fileInputRef.current.value = '';
         } catch (error) {
           console.error("Failed to send message:", error);
-        } finally {
-            console.log(text);
         }
       };
 
     return (
-        <div className="p-4 w-full">
+        <div className="p-4 border-t border-gray-900 w-full">
           {imagePreview && (
             <div className="mb-3 flex items-center gap-2">
               <div className="relative">
