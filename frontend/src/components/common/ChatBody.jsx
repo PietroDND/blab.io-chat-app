@@ -6,6 +6,7 @@ import { formatChatTimeStamp } from '../../utils/date';
 import { useChatStore } from '../../stores/chatStore';
 import ChatBodyPlaceholder from './ChatBodyPlaceholder';
 import ChatInput from './ChatInput';
+import { useUserStore } from '../../stores/userStore';
 
 const ChatBody = ({ chatId }) => {
   const [activeChat, setActiveChat] = useState(null);
@@ -13,6 +14,7 @@ const ChatBody = ({ chatId }) => {
   const { authUser } = useAuthStore();
   const { messages, getMessages, isMessagesLoading } = useMessageStore();
   const { getChatById } = useChatStore();
+  const { selectedUser } = useUserStore();
 
   useEffect(() => {
     if (!chatId) return;
@@ -26,11 +28,12 @@ const ChatBody = ({ chatId }) => {
     fetchActiveChat();
   }, [chatId, getMessages, getChatById]);
 
-  if (!activeChat || !chatId) {
+  if ((!activeChat || !chatId)) {
+    if (selectedUser) return (<div className='h-full'></div>);
     return(
       <div className='w-full h-full flex justify-center items-center'>
         <div className='flex flex-col items-center gap-2'>
-          <div className="size-9 flex flex-col items-center justify-center">
+          <div className="size-9 flex flex-col items-center justify-center animate-bounce">
             <img src={logo} alt="Blab.io Logo" />
           </div>
           <span className='font-bold text-xl text-gray-200'>Welcome to Blab.io!</span>

@@ -13,6 +13,18 @@ const ChatHeader = () => {
   const { selectedChat, setSelectedChat } = useChatStore();
   const { authUser } = useAuthStore();
 
+  const setOnlineUserStatus = (user) => {
+    if (isUserOnline(user._id)) {
+      return (
+        <span className='text-success'>Online</span>
+      );
+    } else {
+      return (
+        <span>Last seen {formatChatTimeStamp(lastSeen[user._id] || user.lastSeen)}</span>
+      );
+    }
+  };
+
   const setOnlineChatStatus = (chat) => {
     if (!chat.isGroupChat) {
       const checkUser = chat.users.find(user => user._id !== authUser._id);
@@ -51,7 +63,7 @@ const ChatHeader = () => {
             <div>
               <h3 className="font-medium">{selectedUser.fullname}</h3>
               <p className="text-sm text-base-content/70">
-                {selectedUser.isOnline ? 'Online' : 'Offline'}
+                {setOnlineUserStatus(selectedUser)}
               </p>
             </div>
           </div>
