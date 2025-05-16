@@ -9,6 +9,7 @@ export const formatDate = (isoDateString) => {
 };
 
 export const formatChatTimeStamp = (dateString) => {
+  if (!dateString) return;
   const date = new Date(dateString);
   const currentDate = new Date();
 

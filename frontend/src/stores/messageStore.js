@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import toast from 'react-hot-toast';
 import { axiosInstance } from '../lib/axios';
+import { useAuthStore } from './authStore';
 
 export const useMessageStore = create((set) => ({
     messages: {},
@@ -39,8 +40,17 @@ export const useMessageStore = create((set) => ({
                     }
                 };
             });
+            const { socket } = useAuthStore.getState();
+            if (!socket) {
+                toast.error('Socket is not connected.');
+                return;
+              }
+            socket.emit('send-message', {
+                chatId,
+                message: res.data
+            });
         } catch (error) {
-            toast.error(error?.response?.data?.msg || `Failed to send message in chat: ${chatId}`);
+            toast.error(error?.response?.data?.msg || error.message || `Failed to send message in chat: ${chatId}`);
         }
     }
 }));

@@ -3,6 +3,8 @@ import { axiosInstance } from '../lib/axios.js';
 import toast from 'react-hot-toast';
 import { io } from 'socket.io-client';
 import { useOnlineStore } from './onlineStore.js';
+import { useMessageStore } from './messageStore.js';
+import { useChatStore } from './chatStore.js';
 
 export const useAuthStore = create((set, get) => ({
     authUser: null,
@@ -89,13 +91,27 @@ export const useAuthStore = create((set, get) => ({
         });
         socket.connect();
         set({ socket });
-        socket.on('connect', () => {
+        socket.on('connect', async () => {
             console.log('✅ Socket connected: ', socket.id);
             socket.emit('join', authUser._id);
+
+            //Fetch user's chats list
+            const res = await axiosInstance.get('/chats');
+            const chatIds = res.data.map(chat => chat._id);
+
+            //Join rooms
+            socket.emit('join-chats', chatIds);
         });
 
         socket.on('online-users', (userIds) => {
             useOnlineStore.getState().setOnlineUsers(userIds);
+        });
+
+        socket.on('new-message', async (message) => {
+            const { getMessages } = useMessageStore.getState();
+            await getMessages(message.chatId);
+            useChatStore.getState().updateLatestMessages(message.chatId, message);
+            //console.log('New message: ', message);
         });
 
         socket.on('disconnect', () => {

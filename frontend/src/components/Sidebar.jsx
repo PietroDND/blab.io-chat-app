@@ -9,13 +9,15 @@ import { useUserStore } from '../stores/userStore'
 
 const Sidebar = () => {
   const { authUser } = useAuthStore();
-  const { chats, selectedChat, setSelectedChat, getChats } = useChatStore();
+  const { chats, selectedChat, setSelectedChat, getChats, latestMessages } = useChatStore();
   const { users, selectedUser, setSelectedUser, isUsersLoading, getUsers } = useUserStore();
 
   useEffect(() => {
     getUsers();
     getChats();
   }, [getUsers, getChats]);
+
+  //console.log(latestMessages);
 
   if (isUsersLoading) return <SidebarPlaceholder />
 
@@ -82,10 +84,10 @@ const Sidebar = () => {
                   <div className='font-medium truncate'>
                     {getChatName(chat, authUser)}
                   </div>
-                  <div className='text-xs text-gray-400'>{formatChatTimeStamp(chat?.updatedAt)}</div>
+                  <div className='text-xs text-gray-400'>{formatChatTimeStamp(latestMessages[chat._id]?.updatedAt)}</div>
                 </div>
                 <div className='text-sm h-6 truncate text-gray-400'>
-                  {getMessagePreview(chat)}
+                  {getMessagePreview(chat, latestMessages[chat._id])}
                 </div>
               </div>
             </button>

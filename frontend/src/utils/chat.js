@@ -16,12 +16,12 @@ export const getChatPic = (chat, authUser) => {
     return chat.groupPic || groupChatPicture;
   }
 };
-export const getMessagePreview = (chat) => {
-  if (chat.latestMessage) {
+export const getMessagePreview = (chat, message) => {
+  if (message) {
     return (
       chat.users.length > 2 ?
-      chat.latestMessage?.senderId?.username + ': ' + chat.latestMessage?.text :
-      chat.latestMessage?.text
+      message?.senderId?.username + ': ' + message?.text :
+      message?.text
     );
   } else {
     return '[No messages]'

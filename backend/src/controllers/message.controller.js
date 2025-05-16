@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Chat from '../models/chat.model.js';
 import Message from '../models/message.model.js'
+import { getReceiverSocketId } from '../lib/socket.js';
 
 export const getMessages = async (req, res) => {
     //TO-DO: PAGINATION
@@ -100,6 +101,7 @@ export const sendMessage = async (req, res) => {
         chat.latestMessage = newMessage._id;
         await chat.save();
         await newMessage.populate('senderId', 'username profilePic');
+
         res.status(201).json(newMessage);
     } catch (error) {
         console.log('Error in sendMessage: ', error.message);

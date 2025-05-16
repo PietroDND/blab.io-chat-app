@@ -5,6 +5,7 @@ import { axiosInstance } from '../lib/axios';
 export const useChatStore = create((set) => ({
     messages: [],
     chats: [],
+    latestMessages: {},
     selectedChat: null,
     isMessagesLoading: false,
     isChatsLoading: false,
@@ -26,6 +27,13 @@ export const useChatStore = create((set) => ({
         try {
             const res = await axiosInstance.get('/chats');
             set({ chats: res.data });
+            for (const chat of res.data) {
+                set((state) => ({ 
+                    latestMessages: {
+                        ...state.latestMessages, 
+                        [chat._id]: chat.latestMessage} 
+                }));
+            }
         } catch (error) {
             toast.error(error.response.data.msg);
         } finally {
@@ -59,6 +67,14 @@ export const useChatStore = create((set) => ({
             toast.error('Failed to create chat');
             return null;
         }
+    },
+
+    updateLatestMessages: (chatId, message) => {
+        set((state) => ({ 
+            latestMessages: {
+                ...state.latestMessages, 
+                [chatId]: message} 
+        }));
     },
 
     setSelectedChat: (selectedChat) => set({ selectedChat }),

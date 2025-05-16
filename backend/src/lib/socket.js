@@ -14,6 +14,10 @@ const io = new Server(server, {
     }
 });
 
+export const getReceiverSocketId = (userId) => {
+    return onlineUsers[userId];
+};
+
 io.on('connection', (socket) => {
     console.log('🔌 User connected: ', socket.id);
 
@@ -21,6 +25,14 @@ io.on('connection', (socket) => {
         onlineUsers.set(userId, socket.id);
         socket.userId = userId;
         io.emit('online-users', Array.from(onlineUsers.keys())); //Broadcast online users list
+
+        socket.on('join-chats', (chatIds) => {
+            chatIds.forEach(chatId => socket.join(chatId));
+        });
+
+        socket.on('send-message', ({chatId, message}) => {
+            io.to(chatId).emit('new-message', message);
+        })
     });
 
     socket.on('disconnect', async () => {
