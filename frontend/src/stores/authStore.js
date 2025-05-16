@@ -1,18 +1,22 @@
 import { create } from 'zustand';
 import { axiosInstance } from '../lib/axios.js';
 import toast from 'react-hot-toast';
+import { io } from 'socket.io-client';
+import { useOnlineStore } from './onlineStore.js';
 
-export const useAuthStore = create((set) => ({
+export const useAuthStore = create((set, get) => ({
     authUser: null,
     isCheckingAuth: true,
     isSigninUp: false,
     isLoggingIn: false,
     isUpdatingProfile: false,
+    socket: null,
 
     checkAuth: async () => {
         try {
             const res = await axiosInstance.get('/auth/check');
             set({ authUser: res.data });
+            get().connectSocket();
         } catch (error) {
             console.log('Error in useAuthStore.checkAuth(): ', error);
             set({ authUser: null });
@@ -27,6 +31,7 @@ export const useAuthStore = create((set) => ({
             const res = await axiosInstance.post('/auth/signup', data);
             set({ authUser: res.data });
             toast.success('Your account has been created successfully.');
+            get().connectSocket();
         } catch (error) {
             toast.error(error.response.data.msg);
         } finally {
@@ -40,6 +45,7 @@ export const useAuthStore = create((set) => ({
             const res = await axiosInstance.post('/auth/login', data);
             set({ authUser: res.data });
             toast.success('You are logged in');
+            get().connectSocket();
         } catch (error) {
             toast.error(error.response.data.msg);
         } finally {
@@ -52,6 +58,7 @@ export const useAuthStore = create((set) => ({
             await axiosInstance.post('/auth/logout');
             set({ authUser: null });
             toast.success('Logout successful');
+            get().disconnectSocket();
         } catch (error) {
             toast.error('Something went wrong - logout failed');
         }
@@ -69,5 +76,44 @@ export const useAuthStore = create((set) => ({
         } finally {
             set({ isUpdatingProfile: false });
         }
-    }
+    },
+
+    connectSocket: () => {
+        const { authUser } = get();
+        if (!authUser || get().socket?.connected) return;
+
+        const socket = io(import.meta.env.VITE_BASE_URL, {
+            query: {
+                userId: authUser._id
+            }
+        });
+        socket.connect();
+        set({ socket });
+        socket.on('connect', () => {
+            console.log('✅ Socket connected: ', socket.id);
+            socket.emit('join', authUser._id);
+        });
+
+        socket.on('online-users', (userIds) => {
+            useOnlineStore.getState().setOnlineUsers(userIds);
+        });
+
+        socket.on('disconnect', () => {
+            console.log('❌ Socket disconnected');
+            useOnlineStore.getState().setOnlineUsers([]); // reset list
+        });
+
+        socket.on('user-went-offline', ({ userId, lastSeen }) => {
+            useOnlineStore.getState().updateLastSeen(userId, lastSeen);
+        });
+    },
+
+    disconnectSocket: () => {
+        const socket = get().socket;
+
+        if(socket?.connected) {
+            socket.disconnect();
+            set({ socket: null });
+        }
+    },
 }));

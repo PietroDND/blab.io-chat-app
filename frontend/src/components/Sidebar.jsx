@@ -33,7 +33,7 @@ const Sidebar = () => {
             <button
               key={user._id}
               onClick={() => {setSelectedUser(user); setSelectedChat(null)}}
-              className={`w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors mb-1 cursor-pointer ${selectedUser?._id === user._id ? 'bg-base-300 ring-1 ring-base-300' : ''}
+              className={`w-full py-2 lg:p-3 flex items-center gap-3 hover:bg-base-300 transition-colors mb-1 cursor-pointer ${selectedUser?._id === user._id ? 'bg-base-300 ring-1 ring-base-300' : ''}
             `}
             >
               <div className=''>
@@ -44,7 +44,7 @@ const Sidebar = () => {
                 />
               </div>
               {/* User Info */}
-              <div className='text-left flex-1 max-h-12 max-w-[73%]'>
+              <div className='hidden lg:block text-left flex-1 max-h-12 max-w-[73%]'>
                 <div className='flex justify-between'>
                   <div className='font-medium truncate'>{user.username}</div>
                 </div>
@@ -66,7 +66,7 @@ const Sidebar = () => {
             <button
               key={chat._id}
               onClick={() => {setSelectedChat(chat); setSelectedUser(null)}}
-              className={`w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors mb-1 cursor-pointer ${selectedChat?._id === chat._id ? 'bg-base-300 ring-1 ring-base-300' : ''}
+              className={`w-full py-2 lg:p-3 flex items-center gap-3 hover:bg-base-300 transition-colors mb-1 cursor-pointer ${selectedChat?._id === chat._id ? 'bg-base-300 ring-1 ring-base-300' : ''}
             `}
             >
               <div className=''>
@@ -77,7 +77,7 @@ const Sidebar = () => {
                 />
               </div>
               {/* Chat Info */}
-              <div className='text-left flex-1 max-h-12 max-w-[73%]'>
+              <div className='hidden lg:block text-left flex-1 max-h-12 max-w-[73%]'>
                 <div className='flex justify-between items-center'>
                   <div className='font-medium truncate'>
                     {getChatName(chat, authUser)}

@@ -4,15 +4,35 @@ import { useChatStore } from '../../stores/chatStore'
 import { X, Info } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useUserStore } from '../../stores/userStore';
+import { useOnlineStore } from '../../stores/onlineStore';
+import { formatChatTimeStamp } from '../../utils/date';
 
 const ChatHeader = () => {
+  const { lastSeen, isUserOnline } = useOnlineStore();
   const { selectedUser, setSelectedUser } = useUserStore();
   const { selectedChat, setSelectedChat } = useChatStore();
   const { authUser } = useAuthStore();
 
-  const setOnlineStatus = (chat) => {
+  const setOnlineChatStatus = (chat) => {
     if (!chat.isGroupChat) {
       const checkUser = chat.users.find(user => user._id !== authUser._id);
+      if(isUserOnline(checkUser._id)) {
+        return (
+          <span className='text-success'>Online</span>
+        );
+      } else {
+        return (
+          <span>Last seen {formatChatTimeStamp(lastSeen[checkUser._id] || checkUser.lastSeen)}</span>
+        );
+      }
+    } else {
+      let onlineCount = 0;
+      for (const user of chat.users) {
+        if (isUserOnline(user._id)) onlineCount++;
+      }
+      return (
+        <span>Members online: {onlineCount}</span>
+      );
     }
   };
 
@@ -61,8 +81,8 @@ const ChatHeader = () => {
 
             <div>
               <h3 className="font-medium">{getChatName(selectedChat, authUser)}</h3>
-              <p className="text-sm text-base-content/70">
-                {setOnlineStatus(selectedChat)}
+              <p className="text-sm text-gray-400">
+                {setOnlineChatStatus(selectedChat)}
               </p>
             </div>
           </div>

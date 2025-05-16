@@ -8,7 +8,7 @@ export const getChats = async (req, res) => {
     const currentUserId = req.user._id;
     try {
         const chats = await Chat.find({ users: currentUserId })
-            .populate('users', 'username profilePic')
+            .populate('users', 'username profilePic lastSeen')
             .populate({
                 path: 'latestMessage',
                 populate: { path: 'senderId', select: 'username' }
@@ -36,7 +36,7 @@ export const getChatById = async (req, res) => {
 
     try {
         const chat = await Chat.findOne({ users: currentUserId, _id: chatId })
-            .populate('users', 'username profilePic')
+            .populate('users', 'username profilePic lastSeen')
             .populate({
                 path: 'latestMessage',
                 populate: { path: 'senderId', select: 'username' }

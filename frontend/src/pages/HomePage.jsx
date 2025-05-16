@@ -1,6 +1,7 @@
 import React from 'react'
 import Sidebar from '../components/Sidebar'
 import ChatContainer from '../components/ChatContainer'
+import { useOnlineStore } from '../stores/onlineStore'
 
 const HomePage = () => {
   return (
