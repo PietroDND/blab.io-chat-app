@@ -26,6 +26,7 @@ const ChatHeader = () => {
   };
 
   const setOnlineChatStatus = (chat) => {
+    console.log(chat, typeof chat);
     if (!chat.isGroupChat) {
       const checkUser = chat.users.find(user => user._id !== authUser._id);
       if(isUserOnline(checkUser._id)) {

@@ -9,8 +9,8 @@ const ChatInput = ({ chatId }) => {
     const [imagePreview, setImagePreview] = useState(null);
     const fileInputRef = useRef(null);
     const { sendMessage } = useMessageStore();
-    const { createChat } = useChatStore();
-    const { selectedUser } = useUserStore();
+    const { createChat, setSelectedChat } = useChatStore();
+    const { selectedUser, setSelectedUser } = useUserStore();
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -40,6 +40,8 @@ const ChatInput = ({ chatId }) => {
         if (!targetChatId) {
           const createdChat = await createChat({users: [selectedUser._id]});
           targetChatId = createdChat._id;
+          setSelectedChat(createdChat);
+          setSelectedUser(null);
         }
     
         try {

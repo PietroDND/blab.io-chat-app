@@ -61,6 +61,9 @@ export const useChatStore = create((set) => ({
             const res = await axiosInstance.post('/chats', payload);
             console.log(res.data);
             const createdChat = res.data;
+            set((state) => ({
+                chats: [createdChat, ...state.chats]
+            }));
             toast.success(groupName ? 'Group chat created' : 'Chat created');
             return createdChat;
         } catch (error) {
