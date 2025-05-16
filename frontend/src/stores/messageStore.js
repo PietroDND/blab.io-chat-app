@@ -30,7 +30,15 @@ export const useMessageStore = create((set) => ({
         };
         try {
             const res = await axiosInstance.post(`/chats/${chatId}/messages`, dataParsed);
-            set((state) => ({ messages: [...state.messages, res.data] }));
+            set((state) => {
+                const prevMessages = state.messages[chatId] || [];
+                return {
+                    messages: {
+                        ...state.messages,
+                        [chatId]: [...prevMessages, res.data]
+                    }
+                };
+            });
         } catch (error) {
             toast.error(error?.response?.data?.msg || `Failed to send message in chat: ${chatId}`);
         }

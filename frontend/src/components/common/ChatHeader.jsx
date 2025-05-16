@@ -10,6 +10,12 @@ const ChatHeader = () => {
   const { selectedChat, setSelectedChat } = useChatStore();
   const { authUser } = useAuthStore();
 
+  const setOnlineStatus = (chat) => {
+    if (!chat.isGroupChat) {
+      const checkUser = chat.users.find(user => user._id !== authUser._id);
+    }
+  };
+
   if (selectedUser && !selectedChat){
     return (
       <div className="p-2.5 border-b border-base-300">
@@ -56,7 +62,7 @@ const ChatHeader = () => {
             <div>
               <h3 className="font-medium">{getChatName(selectedChat, authUser)}</h3>
               <p className="text-sm text-base-content/70">
-                Offline
+                {setOnlineStatus(selectedChat)}
               </p>
             </div>
           </div>
