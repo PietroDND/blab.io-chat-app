@@ -61,7 +61,7 @@ const ChatHeader = () => {
             </div>
 
             <div>
-              <h3 className="font-medium">{selectedUser.fullname}</h3>
+              <h3 className="font-medium">{selectedUser.username}</h3>
               <p className="text-sm text-base-content/70">
                 {setOnlineUserStatus(selectedUser)}
               </p>

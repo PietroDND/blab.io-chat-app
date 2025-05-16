@@ -25,7 +25,6 @@ const ChatContainer = () => {
         )
       });
 
-      console.log(chat);
       return chat ? chat._id : null;
     }
   };
@@ -34,7 +33,7 @@ const ChatContainer = () => {
     <div className='w-full h-full flex flex-col'>
       <ChatHeader />
       <ChatBody chatId={chatToDisplay(selectedChat, selectedUser)} />
-      {selectedChat || selectedUser && (
+      {(selectedChat || selectedUser) && (
         <ChatInput chatId={chatToDisplay(selectedChat, selectedUser)} />
       )}
     </div>
