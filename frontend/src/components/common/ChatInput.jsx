@@ -1,12 +1,16 @@
 import React, { useRef, useState } from 'react'
 import { useMessageStore } from '../../stores/messageStore';
 import { X, Image, Send } from "lucide-react";
+import { useChatStore } from '../../stores/chatStore';
+import { useUserStore } from '../../stores/userStore';
 
 const ChatInput = ({ chatId }) => { 
     const [text, setText] = useState('');
     const [imagePreview, setImagePreview] = useState(null);
     const fileInputRef = useRef(null);
     const { sendMessage } = useMessageStore();
+    const { createChat } = useChatStore();
+    const { selectedUser } = useUserStore();
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -30,9 +34,16 @@ const ChatInput = ({ chatId }) => {
       const handleSendMessage = async (e) => {
         e.preventDefault();
         if (!text.trim() && !imagePreview) return;
+
+        let targetChatId = chatId;
+
+        if (!targetChatId) {
+          const createdChat = await createChat({users: [selectedUser._id]});
+          targetChatId = createdChat._id;
+        }
     
         try {
-          await sendMessage(chatId, {
+          await sendMessage(targetChatId, {
             text: text.trim(),
             image: imagePreview,
           });

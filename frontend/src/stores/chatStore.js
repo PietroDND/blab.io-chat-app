@@ -42,5 +42,24 @@ export const useChatStore = create((set) => ({
         }
     },
 
+    createChat: async ({users, groupName, groupPic}) => {
+        try {
+            const payload = {
+                users,
+                ...(groupName && { groupName }),
+                ...(groupPic && { groupPic }),
+            };
+
+            const res = await axiosInstance.post('/chats', payload);
+            console.log(res.data);
+            const createdChat = res.data;
+            toast.success(groupName ? 'Group chat created' : 'Chat created');
+            return createdChat;
+        } catch (error) {
+            toast.error('Failed to create chat');
+            return null;
+        }
+    },
+
     setSelectedChat: (selectedChat) => set({ selectedChat }),
 }));
