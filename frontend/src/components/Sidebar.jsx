@@ -19,6 +19,8 @@ const Sidebar = () => {
 
   //console.log(latestMessages);
 
+  chats.map((chat) => console.log('Stampo le chat: ', chat));
+
   if (isUsersLoading) return <SidebarPlaceholder />
 
   return (
@@ -73,8 +75,8 @@ const Sidebar = () => {
             >
               <div className=''>
                 <img 
-                  src={getChatPic(chat, authUser)}
-                  alt={`${getChatName(chat, authUser)}'s Avatar`}
+                  src={chat && getChatPic(chat, authUser)}
+                  alt={chat && `${getChatName(chat, authUser)}'s Avatar`}
                   className='size-12 object-cover rounded-lg'
                 />
               </div>

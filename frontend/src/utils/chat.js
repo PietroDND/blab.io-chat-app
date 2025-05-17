@@ -9,8 +9,8 @@ export const getChatName = (chat, authUser) => {
   }
 };
 export const getChatPic = (chat, authUser) => {
-  if(chat.users.length === 2) {
-    const correctUser = chat.users.find((user) => user.username !== authUser.username);
+  if(chat?.users.length === 2) {
+    const correctUser = chat?.users.find((user) => user.username !== authUser.username);
     return correctUser.profilePic;
   } else {
     return chat.groupPic || groupChatPicture;

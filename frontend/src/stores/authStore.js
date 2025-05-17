@@ -3,7 +3,6 @@ import { axiosInstance } from '../lib/axios.js';
 import toast from 'react-hot-toast';
 import { io } from 'socket.io-client';
 import { useOnlineStore } from './onlineStore.js';
-import { useMessageStore } from './messageStore.js';
 import { useChatStore } from './chatStore.js';
 
 export const useAuthStore = create((set, get) => ({
@@ -107,8 +106,12 @@ export const useAuthStore = create((set, get) => ({
             useOnlineStore.getState().setOnlineUsers(userIds);
         });
 
+        socket.on('get-new-chat', async (chat) => {
+            useChatStore.getState().updateChatsList(chat);
+        });
+
         socket.on('new-message', async (message) => {
-            const { getMessages } = useMessageStore.getState();
+            const { getMessages } = useChatStore.getState();
             await getMessages(message.chatId);
             useChatStore.getState().updateLatestMessages(message.chatId, message);
             //console.log('New message: ', message);

@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import toast from 'react-hot-toast';
 import { axiosInstance } from '../lib/axios';
+import { devtools } from 'zustand/middleware'
 
-export const useUserStore = create((set) => ({
+export const useUserStore = create(devtools((set) => ({
     users: [],
     selectedUser: null,
     isUsersLoading: false,
@@ -20,4 +21,4 @@ export const useUserStore = create((set) => ({
     },
 
     setSelectedUser: (selectedUser) => set({ selectedUser })
-}));
+})));

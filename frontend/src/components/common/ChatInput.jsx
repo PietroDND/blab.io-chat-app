@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react'
-import { useMessageStore } from '../../stores/messageStore';
 import { X, Image, Send } from "lucide-react";
 import { useChatStore } from '../../stores/chatStore';
 import { useUserStore } from '../../stores/userStore';
@@ -8,8 +7,7 @@ const ChatInput = ({ chatId }) => {
     const [text, setText] = useState('');
     const [imagePreview, setImagePreview] = useState(null);
     const fileInputRef = useRef(null);
-    const { sendMessage } = useMessageStore();
-    const { createChat, setSelectedChat } = useChatStore();
+    const { createChat, setSelectedChat, sendMessage } = useChatStore();
     const { selectedUser, setSelectedUser } = useUserStore();
 
     const handleImageChange = (e) => {

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware'
 
-export const useOnlineStore = create((set) => ({
+export const useOnlineStore = create(devtools((set) => ({
     onlineUsers: [],
     lastSeen: {},
     
@@ -18,4 +19,4 @@ export const useOnlineStore = create((set) => ({
         }
       }));
     }
-}));
+})));

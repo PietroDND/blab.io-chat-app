@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import logo from '../../assets/blab_logo.png';
-import { useMessageStore } from '../../stores/messageStore';
 import { useAuthStore } from '../../stores/authStore';
 import { formatChatTimeStamp } from '../../utils/date';
 import { useChatStore } from '../../stores/chatStore';
 import ChatBodyPlaceholder from './ChatBodyPlaceholder';
-import ChatInput from './ChatInput';
 import { useUserStore } from '../../stores/userStore';
 
 const ChatBody = ({ chatId }) => {
   const [activeChat, setActiveChat] = useState(null);
 
   const { authUser } = useAuthStore();
-  const { messages, getMessages, isMessagesLoading } = useMessageStore();
-  const { getChatById } = useChatStore();
+  const { messages, getMessages, isMessagesLoading, getChatById } = useChatStore();
   const { selectedUser } = useUserStore();
 
   useEffect(() => {

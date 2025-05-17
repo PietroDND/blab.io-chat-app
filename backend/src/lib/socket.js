@@ -30,6 +30,11 @@ io.on('connection', (socket) => {
             chatIds.forEach(chatId => socket.join(chatId));
         });
 
+        socket.on('join-new-chat', (chat) => {
+            socket.join(chat._id);
+            io.to(chat._id).emit('get-new-chat', (chat));
+        });
+
         socket.on('send-message', ({chatId, message}) => {
             io.to(chatId).emit('new-message', message);
         })

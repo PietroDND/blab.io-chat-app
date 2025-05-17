@@ -35,7 +35,7 @@ export const formatChatTimeStamp = (dateString) => {
       hour12: false
     });
   } else if (isYesterday) {
-    return 'Yesterday';
+    return 'yesterday';
   } else {
     return date.toLocaleTimeString('en-US');
   }
