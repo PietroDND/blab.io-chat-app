@@ -1,7 +1,7 @@
 export const formatDate = (isoDateString) => {
     if (!isoDateString) return '';
     const date = new Date(isoDateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('en-UK', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -29,7 +29,7 @@ export const formatChatTimeStamp = (dateString) => {
   })();
 
   if(isToday) {
-    return date.toLocaleTimeString('en-US', {
+    return date.toLocaleTimeString('en-UK', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false
@@ -37,7 +37,11 @@ export const formatChatTimeStamp = (dateString) => {
   } else if (isYesterday) {
     return 'yesterday';
   } else {
-    return date.toLocaleTimeString('en-US');
+    return date.toLocaleDateString('en-UK', {
+      year: '2-digit',
+      month: '2-digit',
+      day: 'numeric',
+    });
   }
 };
   

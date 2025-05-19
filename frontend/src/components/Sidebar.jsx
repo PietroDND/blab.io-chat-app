@@ -19,7 +19,7 @@ const Sidebar = () => {
 
   //console.log(latestMessages);
 
-  chats.map((chat) => console.log('Stampo le chat: ', chat));
+  //chats.map((chat) => console.log('Stampo le chat: ', chat));
 
   if (isUsersLoading) return <SidebarPlaceholder />
 

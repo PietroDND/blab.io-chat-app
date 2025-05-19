@@ -6,7 +6,8 @@ const userSchema = new mongoose.Schema({
     email:    { type: String, required: true, unique: true },
     password: { type: String, required: true },
     profilePic: { type: String, default: ''},
-    lastSeen: { type: Date }
+    lastSeen: { type: Date },
+    isAdmin: { type: Boolean, required: true}
 }, { timestamps: true} );
 
 const User = mongoose.model('User', userSchema);
