@@ -1,43 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import ChatHeader from './common/ChatHeader'
-import ChatBody from './common/ChatBody'
-import ChatInfo from './common/ChatInfo'
-import { useChatStore } from '../stores/chatStore'
-import ChatInput from './common/ChatInput'
-import { useUserStore } from '../stores/userStore'
-import { useAuthStore } from '../stores/authStore'
+import React from 'react'
+import ChatHeader from './ChatHeader'
+import { useChatStore } from '../stores/chatStore';
+import { useUserStore } from '../stores/userStore';
+import ChatInput from './ChatInput';
 
 const ChatContainer = () => {
-  const { authUser } = useAuthStore();
-  const { selectedChat, chats } = useChatStore();
+  const { messages, getMessages, isMessagesLoading, selectedChat } = useChatStore();
   const { selectedUser } = useUserStore();
-
-  const chatId = useMemo(() => {
-    if (selectedChat) return selectedChat._id;
-
-    if (selectedUser) {
-      const chat = chats.find(chat => {
-        return (
-          !chat.isGroupChat &&
-          chat.users.length === 2 &&
-          chat.users.some(user => user._id === authUser._id) &&
-          chat.users.some(user => user._id === selectedUser._id)
-        );
-      });
-      return chat ? chat._id : null;
-    }
-    return null;
-  }, [selectedChat, selectedUser, chats, authUser._id]);
-
-  //console.log('ChatId from ChatContainer: ', chatId);
-
   return (
-    <div className='w-full h-full flex flex-col'>
-      <ChatHeader />
-      <ChatBody chatId={chatId} />
-      {(selectedChat || selectedUser) && (
-        <ChatInput chatId={chatId} />
-      )}
+    <div className='flex-1'>
+      <div className='flex flex-col h-full'>
+        <ChatHeader />
+        <div className='flex-1'>ChatBox</div>
+        <ChatInput />
+
+      </div>
     </div>
   )
 }

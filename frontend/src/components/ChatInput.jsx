@@ -1,13 +1,14 @@
 import React, { useRef, useState } from 'react'
 import { X, Image, Send } from "lucide-react";
-import { useChatStore } from '../../stores/chatStore';
-import { useUserStore } from '../../stores/userStore';
+import { useChatStore } from '../stores/chatStore';
+import { useUserStore } from '../stores/userStore';
+import toast from 'react-hot-toast';
 
-const ChatInput = ({ chatId }) => { 
+const ChatInput = () => { 
     const [text, setText] = useState('');
     const [imagePreview, setImagePreview] = useState(null);
     const fileInputRef = useRef(null);
-    const { createChat, setSelectedChat, sendMessage } = useChatStore();
+    const { createChat, selectedChat, setSelectedChat, sendMessage } = useChatStore();
     const { selectedUser, setSelectedUser } = useUserStore();
 
     const handleImageChange = (e) => {
@@ -33,17 +34,17 @@ const ChatInput = ({ chatId }) => {
         e.preventDefault();
         if (!text.trim() && !imagePreview) return;
 
-        let targetChatId = chatId;
-
-        if (!targetChatId) {
-          const createdChat = await createChat({users: [selectedUser._id]});
-          targetChatId = createdChat._id;
-          setSelectedChat(createdChat);
-          setSelectedUser(null);
+        if (selectedUser && !selectedChat) {
+            try {
+                const createdChat = await createChat({users: [selectedUser._id]});
+                setSelectedChat(createdChat);
+            } catch (error) {
+                console.error("Failed to create chat:", error);
+          }
         }
     
         try {
-          await sendMessage(targetChatId, {
+          await sendMessage(selectedChat._id, {
             text: text.trim(),
             image: imagePreview,
           });

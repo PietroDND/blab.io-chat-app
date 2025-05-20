@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import cloudinary from "../lib/cloudinary.js";
 import Chat from "../models/chat.model.js";
+import { io } from "../lib/socket.js";
 
 const DEFAULT_GROUP_PIC_URL = 'https://res.cloudinary.com/db9yd5h2v/image/upload/v1747230380/group-chat-default_pettly.png';
 
@@ -105,7 +106,6 @@ export const createChat = async (req, res) => {
         const chat = await Chat.create(chatData);
         await chat.populate('users', 'username profilePic');
         await chat.populate('groupAdmins', 'username');
-
         res.status(201).json(chat);
     } catch (error) {
         console.error('Error in createChat: ', error.message);

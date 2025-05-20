@@ -2,16 +2,21 @@ import { create } from 'zustand';
 import { axiosInstance } from '../lib/axios.js';
 import toast from 'react-hot-toast';
 import { io } from 'socket.io-client';
-import { useOnlineStore } from './onlineStore.js';
+import { devtools } from 'zustand/middleware';
 import { useChatStore } from './chatStore.js';
+import { useUserStore } from './userStore.js';
 
-export const useAuthStore = create((set, get) => ({
+const debug = false;
+
+export const useAuthStore = create(devtools((set, get) => ({
     authUser: null,
     isCheckingAuth: true,
     isSigninUp: false,
     isLoggingIn: false,
     isUpdatingProfile: false,
     socket: null,
+    onlineUsers: [],
+    lastSeen: {},
 
     checkAuth: async () => {
         try {
@@ -79,6 +84,19 @@ export const useAuthStore = create((set, get) => ({
         }
     },
 
+    isUserOnline: (userId) => {
+        return get().onlineUsers.includes(userId);
+    },
+
+    updateLastSeen: (userId, timestamp) => {
+        set((state) => ({
+          lastSeen: {
+            ...state.lastSeen,
+            [userId]: timestamp
+          }
+        }));
+    },
+
     connectSocket: () => {
         const { authUser } = get();
         if (!authUser || get().socket?.connected) return;
@@ -94,36 +112,40 @@ export const useAuthStore = create((set, get) => ({
             console.log('✅ Socket connected: ', socket.id);
             socket.emit('join', authUser._id);
 
+            //Fetch registered users list
+            await useUserStore.getState().getUsers();
+            if (debug) console.log('Users retrieved: ', useUserStore.getState().users);
             //Fetch user's chats list
-            const res = await axiosInstance.get('/chats');
-            const chatIds = res.data.map(chat => chat._id);
+            const chats = await useChatStore.getState().getChats();
+            if (debug) console.log('chats retrieved: ', chats);
+            const chatIds = chats.map(chat => chat._id);
 
             //Join rooms
             socket.emit('join-chats', chatIds);
         });
 
         socket.on('online-users', (userIds) => {
-            useOnlineStore.getState().setOnlineUsers(userIds);
+            set({ onlineUsers: userIds });
         });
 
-        socket.on('get-new-chat', async (chat) => {
+        socket.on('get-new-chat', (chat) => {
+            if (debug) console.log('New chat received: ', chat);
             useChatStore.getState().updateChatsList(chat);
         });
 
-        socket.on('new-message', async (message) => {
-            const { getMessages } = useChatStore.getState();
-            await getMessages(message.chatId);
-            useChatStore.getState().updateLatestMessages(message.chatId, message);
-            //console.log('New message: ', message);
+        socket.on('receive-message', ({ chatId, message }) => {
+            // Update messages in chatStore
+            useChatStore.getState().addMessage(chatId, message);
+            useChatStore.getState().updateLatestMessages(chatId, message.text); // Optional
         });
 
         socket.on('disconnect', () => {
             console.log('❌ Socket disconnected');
-            useOnlineStore.getState().setOnlineUsers([]); // reset list
+            set({ onlineUsers: [] }); // reset list
         });
 
         socket.on('user-went-offline', ({ userId, lastSeen }) => {
-            useOnlineStore.getState().updateLastSeen(userId, lastSeen);
+            get().updateLastSeen(userId, lastSeen);
         });
     },
 
@@ -135,4 +157,4 @@ export const useAuthStore = create((set, get) => ({
             set({ socket: null });
         }
     },
-}));
+})));

@@ -7,7 +7,7 @@ import LoginPage from './pages/LoginPage'
 import ProfilePage from './pages/ProfilePage'
 import SettingsPage from './pages/SettingsPage'
 import { useAuthStore } from './stores/authStore'
-import LoadingScreen from './components/LoadingScreen'
+import LoadingScreen from './components/shared/LoadingScreen'
 import { Toaster } from 'react-hot-toast'
 
 const App = () => {

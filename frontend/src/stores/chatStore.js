@@ -1,16 +1,36 @@
 import { create } from 'zustand';
+import { axiosInstance } from '../lib/axios.js';
 import toast from 'react-hot-toast';
-import { axiosInstance } from '../lib/axios';
-import { devtools } from 'zustand/middleware'
-import { useAuthStore } from './authStore';
+import { useAuthStore } from './authStore.js';
 
-export const useChatStore = create(devtools((set, get) => ({
-    messages: {},
+export const useChatStore = create((set, get) => ({
     chats: [],
+    messages: {},
     latestMessages: {},
     selectedChat: null,
     isMessagesLoading: false,
     isChatsLoading: false,
+
+    getChats: async () => {
+        set({ isChatsLoading: true });
+        try {
+            const res = await axiosInstance.get('/chats');
+            
+            // Clear existing chats and latestMessages before reloading
+            set({ chats: [], latestMessages: {} });
+
+            for(const chat of res.data){
+                get().updateChatsList(chat);
+            }
+
+            return res.data;
+        } catch (error) {
+            toast.error(error.response.data.msg);
+            return null;
+        } finally {
+            set({ isChatsLoading: false });
+        }
+    },
 
     getMessages: async (chatId) => {
         set((state) => {
@@ -28,34 +48,6 @@ export const useChatStore = create(devtools((set, get) => ({
         }
     },
 
-    getChats: async () => {
-        set({ isChatsLoading: true });
-        try {
-            const res = await axiosInstance.get('/chats');
-            set({ chats: res.data });
-            for (const chat of res.data) {
-                set((state) => ({ 
-                    latestMessages: {
-                        ...state.latestMessages, 
-                        [chat._id]: chat.latestMessage} 
-                }));
-            }
-        } catch (error) {
-            toast.error(error.response.data.msg);
-        } finally {
-            set({ isChatsLoading: false });
-        }
-    },
-
-    getChatById: async (chatId) => {
-        try {
-            const res = await axiosInstance.get(`/chats/${chatId}`);
-            return res.data;
-        } catch (error) {
-            toast.error(error?.response?.data?.msg || `Failed to retrieve chat: ${chatId}`);
-        }
-    },
-
     createChat: async ({users, groupName, groupPic}) => {
         try {
             const payload = {
@@ -65,35 +57,20 @@ export const useChatStore = create(devtools((set, get) => ({
             };
 
             const res = await axiosInstance.post('/chats', payload);
-            //console.log(res.data);
-            const createdChat = res.data;
-            get().updateChatsList(createdChat);
-            const { socket } = useAuthStore.getState();
-            if (!socket) {
-                toast.error('Socket is not connected.');
+
+            const socket = useAuthStore.getState().socket;
+            if (!socket || !socket.connected) {
+                console.error('Socket not ready or connected.');
                 return;
             }
-            socket.emit('join-new-chat', ({chat: createdChat}));
-            toast.success(groupName ? 'Group chat created' : 'Chat created');
-            return createdChat;
+            
+            get().updateChatsList(res.data);
+            socket.emit('new-chat', res.data);
+
+            return res.data;
         } catch (error) {
             toast.error('Failed to create chat');
-            return null;
         }
-    },
-
-    updateLatestMessages: (chatId, message) => {
-        set((state) => ({ 
-            latestMessages: {
-                ...state.latestMessages, 
-                [chatId]: message} 
-        }));
-    },
-
-    updateChatsList: (chat) => {
-        set((state) => ({
-            chats: [chat, ...state.chats]
-        }));
     },
 
     sendMessage: async (chatId, data) => {
@@ -102,30 +79,30 @@ export const useChatStore = create(devtools((set, get) => ({
             ...(text && { text }),
             ...(image && { image })
         };
+
         try {
             const res = await axiosInstance.post(`/chats/${chatId}/messages`, dataParsed);
-            set((state) => {
-                const prevMessages = state.messages[chatId] || [];
-                return {
-                    messages: {
-                        ...state.messages,
-                        [chatId]: [...prevMessages, res.data]
-                    }
-                };
-            });
-            const { socket } = useAuthStore.getState();
-            if (!socket) {
-                toast.error('Socket is not connected.');
-                return;
-              }
-            socket.emit('send-message', {
-                chatId,
-                message: res.data
-            });
         } catch (error) {
-            toast.error(error?.response?.data?.msg || error.message || `Failed to send message in chat: ${chatId}`);
+            
         }
     },
 
-    setSelectedChat: (selectedChat) => set({ selectedChat }),
-})));
+    updateChatsList: (newChat) => {
+        set((state) => {
+            const chatExist = state.chats.some(chat => chat._id === newChat._id);
+            if (chatExist) return {}; //No changes if chat already exist
+
+            return {
+                chats: [...state.chats, newChat],
+                ...(newChat.latestMessage && {
+                    latestMessages: {
+                        ...state.latestMessages,
+                        [newChat._id]: newChat.latestMessage
+                    }
+                })
+            }
+        });
+    },
+
+    setSelectedChat: (selectedChat) => set({ selectedChat })
+}));

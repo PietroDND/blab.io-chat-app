@@ -18,6 +18,17 @@ export const getReceiverSocketId = (userId) => {
     return onlineUsers[userId];
 };
 
+function logRoomStatus(io, roomId) {
+    const room = io.sockets.adapter.rooms.get(roomId);
+    if (room) {
+        const socketIds = Array.from(room);
+        console.log(`Room ${roomId} has ${socketIds.length} socket(s):`, socketIds);
+    } else {
+        console.log(`Room ${roomId} does not exist or is empty.`);
+    }
+}
+
+
 io.on('connection', (socket) => {
     console.log('🔌 User connected: ', socket.id);
 
@@ -27,17 +38,28 @@ io.on('connection', (socket) => {
         io.emit('online-users', Array.from(onlineUsers.keys())); //Broadcast online users list
 
         socket.on('join-chats', (chatIds) => {
-            chatIds.forEach(chatId => socket.join(chatId));
+            chatIds.forEach(chatId => socket.join(chatId)); //Join every chat the user is in
         });
+    });
 
-        socket.on('join-new-chat', (chat) => {
-            socket.join(chat._id);
-            io.to(chat._id).emit('get-new-chat', (chat));
+    socket.on('send-message', ({ chatId, message }) => {
+        // Emit to all users in the room (chatId = room name)
+        socket.to(chatId).emit('receive-message', { chatId, message });
+    });
+
+    socket.on('new-chat', (chat) => {
+        const chatId = chat._id;
+        socket.join(chatId);
+
+        //Make all other users join the new chat room
+        chat.users.forEach((user) => {
+            const targetSocketId = onlineUsers.get(user._id);
+            if (targetSocketId && targetSocketId !== socket.id) {
+                io.to(targetSocketId).emit('get-new-chat', chat); // emit full chat info
+                io.sockets.sockets.get(targetSocketId)?.join(chatId); // force join to room
+                //logRoomStatus(io, chatId);
+            }
         });
-
-        socket.on('send-message', ({chatId, message}) => {
-            io.to(chatId).emit('new-message', message);
-        })
     });
 
     socket.on('disconnect', async () => {

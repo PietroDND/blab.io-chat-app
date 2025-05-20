@@ -1,16 +1,16 @@
 import React from 'react'
 import { Users, MessageSquareText } from 'lucide-react';
 
-const SidebarPlaceholder = () => {
+const SidebarSkeleton = () => {
 
-    const placeholderContacts = Array(12).fill(null);
+    const placeholderContacts = Array(10).fill(null);
 
   return (
     <aside
         className="h-full w-20 lg:w-72 border-r border-base-300 
         flex flex-col transition-all duration-200"
     >
-        <div className="w-full collapse collapse-arrow bg-base-100 border-b border-base-300">
+        <div className="w-full collapse collapse-arrow bg-base-100 border-b border-base-300 max-h-[80%]">
         <input type="radio" name="my-accordion-2" defaultChecked />
         <div className="flex items-center gap-2 collapse-title">
             <Users className="size-5" />
@@ -39,7 +39,7 @@ const SidebarPlaceholder = () => {
         </div>
       </div>
 
-      <div className="w-full collapse collapse-arrow bg-base-100 border-base-300">
+      <div className="w-full collapse collapse-arrow bg-base-100 border-base-300 max-h-[90%]">
         <input type="radio" name="my-accordion-2" />
         <div className="flex items-center gap-2 collapse-title">
           <MessageSquareText className='size-5' />
@@ -71,4 +71,4 @@ const SidebarPlaceholder = () => {
     )
 }
 
-export default SidebarPlaceholder
+export default SidebarSkeleton

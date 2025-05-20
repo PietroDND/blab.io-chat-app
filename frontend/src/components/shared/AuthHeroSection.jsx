@@ -1,5 +1,5 @@
 import React from 'react'
-import blabHeroImage from '../assets/blab_hero_notext.png';
+import blabHeroImage from '../../assets/blab_hero_notext.png';
 
 const AuthHeroSection = () => {
   return (

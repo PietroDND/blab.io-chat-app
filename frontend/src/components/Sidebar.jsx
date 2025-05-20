@@ -1,102 +1,116 @@
-import React, { useEffect } from 'react'
-import { useChatStore } from '../stores/chatStore'
-import SidebarPlaceholder from '../components/SidebarPlaceholder'
-import { Users, MessageSquareText } from 'lucide-react'
+import React from 'react'
 import { useAuthStore } from '../stores/authStore'
-import { formatChatTimeStamp } from '../utils/date'
-import { getChatName, getChatPic, getMessagePreview } from '../utils/chat'
-import { useUserStore } from '../stores/userStore'
+import { useChatStore } from '../stores/chatStore';
+import { useUserStore } from '../stores/userStore';
+import { Users, MessageSquareText } from 'lucide-react'
+import { formatChatTimeStamp } from '../utils/date';
+import SidebarSkeleton from './skeletons/SidebarSkeleton'
 
 const Sidebar = () => {
-  const { authUser } = useAuthStore();
-  const { chats, selectedChat, setSelectedChat, getChats, latestMessages } = useChatStore();
-  const { users, selectedUser, setSelectedUser, isUsersLoading, getUsers } = useUserStore();
+  const { authUser, isUserOnline } = useAuthStore();
+  const { chats, selectedChat, setSelectedChat, latestMessages, isChatsLoading } = useChatStore();
+  const { users, selectedUser, setSelectedUser, isUsersLoading } = useUserStore();
 
-  useEffect(() => {
-    getUsers();
-    getChats();
-  }, [getUsers, getChats]);
+  const userSelection = (user) => {
+    setSelectedUser(user);
+    const existingChat = chats.find((chat) => {
+      if (chat.isGroupChat) return false;
+      const userIds = chat.users.map(user => user._id);
+      return userIds.includes(authUser._id) && userIds.includes(user._id) && userIds.length === 2;
+    });
 
-  //console.log(latestMessages);
+    if (existingChat) {
+      setSelectedChat(existingChat);
+    } else {
+      setSelectedChat(null);
+    }
+  };
 
-  //chats.map((chat) => console.log('Stampo le chat: ', chat));
-
-  if (isUsersLoading) return <SidebarPlaceholder />
+  if(isUsersLoading || isChatsLoading) {
+    return(
+      <SidebarSkeleton />
+    )
+  }
 
   return (
-    <aside className='h-full w-20 lg:w-100 border-r border-base-300 flex flex-col transition-all duration-200'>
-      {/* <SidebarHeader /> */}
-      <div className="w-full collapse collapse-arrow bg-base-100 border-b border-base-300">
-        <input type="radio" name="my-accordion-2" defaultChecked />
-        <div className="flex items-center gap-2 collapse-title">
+    <aside className='h-full w-20 lg:w-75 border-r border-base-300 flex flex-col transition-all duration-200'>
+      <div className="join join-vertical bg-base-100">
+        <div className="collapse collapse-arrow join-item border-base-300 border-b">
+          <input type="radio" name="my-accordion-4" defaultChecked />
+          <div className="collapse-title flex items-center gap-2 h-[70px]">
             <Users className="size-5" />
             <span className="hidden lg:block">Contacts</span>
-        </div>
-        <div className="collapse-content w-full overflow-y-auto">
-          {users.map((user) => (
-            <button
-              key={user._id}
-              onClick={() => {setSelectedUser(user); setSelectedChat(null)}}
-              className={`w-full py-2 lg:p-3 flex items-center gap-3 hover:bg-base-300 transition-colors mb-1 cursor-pointer ${selectedUser?._id === user._id ? 'bg-base-300 ring-1 ring-base-300' : ''}
-            `}
-            >
-              <div className=''>
-                <img 
-                  src={user.profilePic || '/avatar.png'} 
-                  alt={`${user.username} Avatar`}
-                  className='size-12 object-cover rounded-lg'
-                />
-              </div>
-              {/* User Info */}
-              <div className='hidden lg:block text-left flex-1 max-h-12 max-w-[73%]'>
-                <div className='flex justify-between'>
-                  <div className='font-medium truncate'>{user.username}</div>
+          </div>
+          <div className="collapse-content">
+            {users.map((user) => (
+              <button
+                key={user._id}
+                onClick={() => userSelection(user)}
+                className={`w-full py-2 lg:p-3 flex items-center gap-3 hover:bg-base-300 transition-colors mb-1 cursor-pointer ${selectedUser?._id === user._id ? 'bg-base-300 ring-1 ring-base-300' : ''}
+              `}
+              >
+                <div className='relative'>
+                  <img 
+                    src={user.profilePic || '/avatar.png'} 
+                    alt={`${user.username} Avatar`}
+                    className='size-12 object-cover rounded-lg'
+                  />
+                  <div aria-label="success" className={`${isUserOnline(user._id) ? 'inline-block' : 'hidden'} bg-green-400 rounded-full size-3 absolute -right-1 -bottom-1`}></div>
                 </div>
-                <div className='text-sm h-6 truncate text-gray-400'>{user.fullname}</div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="w-full collapse collapse-arrow bg-base-100 border-base-300">
-        <input type="radio" name="my-accordion-2" />
-        <div className="flex items-center gap-2 collapse-title">
-          <MessageSquareText className='size-5' />
-          <span className="hidden lg:block">Chats</span>
-        </div>
-        <div className="collapse-content w-full overflow-y-auto">
-          {chats.map((chat) => (
-            <button
-              key={chat._id}
-              onClick={() => {setSelectedChat(chat); setSelectedUser(null)}}
-              className={`w-full py-2 lg:p-3 flex items-center gap-3 hover:bg-base-300 transition-colors mb-1 cursor-pointer ${selectedChat?._id === chat._id ? 'bg-base-300 ring-1 ring-base-300' : ''}
-            `}
-            >
-              <div className=''>
-                <img 
-                  src={chat && getChatPic(chat, authUser)}
-                  alt={chat && `${getChatName(chat, authUser)}'s Avatar`}
-                  className='size-12 object-cover rounded-lg'
-                />
-              </div>
-              {/* Chat Info */}
-              <div className='hidden lg:block text-left flex-1 max-h-12 max-w-[73%]'>
-                <div className='flex justify-between items-center'>
-                  <div className='font-medium truncate'>
-                    {getChatName(chat, authUser)}
+                {/* User Info */}
+                <div className='hidden lg:block text-left flex-1 max-h-12 max-w-[73%]'>
+                  <div className='flex justify-between'>
+                    <div className='font-medium truncate'>{user.username}</div>
                   </div>
-                  <div className='text-xs text-gray-400'>{formatChatTimeStamp(latestMessages[chat._id]?.updatedAt)}</div>
+                  <div className='text-sm h-6 truncate text-gray-400'>{user.fullname}</div>
                 </div>
-                <div className='text-sm h-6 truncate text-gray-400'>
-                  {getMessagePreview(chat, latestMessages[chat._id])}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="collapse collapse-arrow join-item border-base-300 max-h-[90%]">
+          <input type="radio" name="my-accordion-4" />
+          <div className="collapse-title flex items-center gap-2 h-[70px]">
+            <MessageSquareText className="size-5" />
+            <span className="hidden lg:block">Chats</span>
+          </div>
+          <div className="collapse-content">
+            {chats.map((chat) => (
+              <button
+                key={chat._id}
+                onClick={() => {setSelectedUser(null); setSelectedChat(chat)}}
+                className={`w-full py-2 lg:p-3 flex items-center gap-3 hover:bg-base-300 transition-colors mb-1 cursor-pointer ${selectedChat?._id === chat._id ? 'bg-base-300 ring-1 ring-base-300' : ''}
+              `}
+              >
+                <div className=''>
+                  <img 
+                    src={chat.isGroupChat 
+                      ? chat.groupPic 
+                      : chat.users.find(user => user._id !== authUser._id)?.profilePic
+                    } 
+                    alt={`${chat?.groupName} Avatar`}
+                    className='size-12 object-cover rounded-lg'
+                  />
                 </div>
-              </div>
-            </button>
-          ))}
+                {/* Chat Info */}
+                <div className='hidden lg:block text-left flex-1 max-h-12 max-w-[73%]'>
+                  <div className='flex justify-between'>
+                    <div className="flex justify-between items-center w-full">
+                      <div className='font-medium truncate'>{
+                        chat.isGroupChat
+                        ? chat.groupName
+                        : chat.users.find(user => user._id !== authUser._id)?.username
+                        }</div>
+                      <div className='text-xs text-gray-400'>{formatChatTimeStamp(latestMessages[chat._id]?.updatedAt)}</div>
+                    </div>
+                  </div>
+                  <div className='text-sm h-6 truncate text-gray-400'>{chat?.latestMessage?.text}</div>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-
     </aside>
   )
 }
