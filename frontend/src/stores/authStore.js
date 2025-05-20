@@ -6,7 +6,7 @@ import { devtools } from 'zustand/middleware';
 import { useChatStore } from './chatStore.js';
 import { useUserStore } from './userStore.js';
 
-const debug = true;
+const debug = false;
 
 export const useAuthStore = create(devtools((set, get) => ({
     authUser: null,
@@ -114,11 +114,14 @@ export const useAuthStore = create(devtools((set, get) => ({
 
             //Fetch registered users list
             await useUserStore.getState().getUsers();
-            if (debug) console.log('Users retrieved: ', useUserStore.getState().users);
             //Fetch user's chats list
             const chats = await useChatStore.getState().getChats();
-            if (debug) console.log('chats retrieved: ', chats);
             const chatIds = chats.map(chat => chat._id);
+
+            //Fetch user's messages
+            for (const chat of chats) {
+                await useChatStore.getState().getMessages(chat._id);
+            }
 
             //Join rooms
             socket.emit('join-chats', chatIds);
@@ -133,10 +136,22 @@ export const useAuthStore = create(devtools((set, get) => ({
             useChatStore.getState().updateChatsList(chat);
         });
 
-        socket.on('get-new-message', (message) => {
-            // Update messages in chatStore
-            if (debug) console.log('New message got: ', message);
+        socket.on('get-new-message', async (message) => {
+            const isChatOpen = useChatStore.getState().selectedChat?._id === message.chatId;
+            //Mark message as read before adding to the messages store, if chat is open
+            if (isChatOpen && !message.message.readBy.includes(authUser._id)) {
+                message.message.readBy.push(authUser._id);
+            }
+
+            // Append to store
             useChatStore.getState().appendMessage(message.chatId, message.message);
+
+            if (isChatOpen) {
+                useChatStore.getState().markMessagesAsRead(message.chatId).catch((error) => {
+                    console.error('Failed to auto-mark message as read:', error.message);
+                });
+                useChatStore.getState().markMessagesAsReadLocally(message.chatId, authUser._id);
+            }
         });
 
         socket.on('disconnect', () => {

@@ -8,22 +8,26 @@ import { useAuthStore } from '../stores/authStore';
 
 const ChatContainer = () => {
   const { authUser } = useAuthStore();
-  const { messages, getMessages, isMessagesLoading, selectedChat } = useChatStore();
+  const { messages, getMessages, isMessagesLoading, selectedChat, markMessagesAsRead, markMessagesAsReadLocally } = useChatStore();
   const { selectedUser } = useUserStore();
 
   useEffect(() => {
     if (!selectedChat) return;
 
-    const fetchMessages = async () => {
+    const loadMessagesAndMarkAsRead = async () => {
       try {
-        await getMessages(selectedChat._id);
+        await getMessages(selectedChat._id); // wait for the fetch to complete
+        await markMessagesAsRead(selectedChat._id); // then mark as read in DB
+        markMessagesAsReadLocally(selectedChat._id, authUser._id); // then update local store
       } catch (error) {
-        console.error('Error while retrieving messages from ChatContainer component: ', error.message);
+        console.error('Error loading messages or marking as read: ', error.message);
       }
     };
 
-    fetchMessages();
+    loadMessagesAndMarkAsRead();
   }, [selectedChat]);
+
+  //console.log(messages);
 
   return (
     <div className='flex-1'>

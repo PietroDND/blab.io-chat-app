@@ -141,6 +141,41 @@ export const useChatStore = create((set, get) => ({
             };
         });
     },
+
+    markMessagesAsRead: async (chatId) => {
+        try {
+            await axiosInstance.put(`/chats/${chatId}/messages/mark-as-read`);
+        } catch (error) {
+            toast.error('Failed to mark messages as read');
+        }
+    },
+
+    markMessagesAsReadLocally: (chatId, userId) => {
+        set((state) => {
+          const updated = (state.messages[chatId] || []).map((msg) => {
+            if (msg.senderId !== userId && !msg.readBy.includes(userId)) {
+              return {
+                ...msg,
+                readBy: [...msg.readBy, userId]
+              };
+            }
+            return msg;
+          });
+      
+          return {
+            messages: {
+              ...state.messages,
+              [chatId]: updated
+            }
+          };
+        });
+    },
+    
+    getUnreadCount: (chatId) => {
+        const userId = useAuthStore.getState().authUser._id;
+        const messages = get().messages[chatId] || [];
+        return messages.filter((msg) => msg.senderId !== userId && !msg.readBy.includes(userId)).length;
+    },
     
     setSelectedChat: (selectedChat) => set({ selectedChat })
 }));

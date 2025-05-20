@@ -8,7 +8,7 @@ import SidebarSkeleton from './skeletons/SidebarSkeleton'
 
 const Sidebar = () => {
   const { authUser, isUserOnline } = useAuthStore();
-  const { chats, selectedChat, setSelectedChat, latestMessages, isChatsLoading } = useChatStore();
+  const { chats, selectedChat, setSelectedChat, latestMessages, isChatsLoading, getUnreadCount } = useChatStore();
   const { users, selectedUser, setSelectedUser, isUsersLoading } = useUserStore();
 
   const userSelection = (user) => {
@@ -128,7 +128,14 @@ const Sidebar = () => {
                       <div className='text-xs text-gray-400'>{formatChatTimeStamp(latestMessages[chat._id]?.updatedAt)}</div>
                     </div>
                   </div>
-                  <div className='flex items-center text-sm h-6 text-gray-400 truncate w-45'>{getLatestMessage(chat)}</div>
+                  <div className='flex justify-between items-center'>
+                    <div className='flex items-center text-sm h-6 text-gray-400 truncate w-35'>{getLatestMessage(chat)}</div>
+                    <div 
+                      className={`bg-primary size-5 rounded-full p-3 text-sm justify-center items-center ${getUnreadCount(chat._id) > 0 ? 'flex' : 'hidden'}`}
+                    >
+                      {getUnreadCount(chat._id)}
+                    </div>
+                  </div>
                 </div>
               </button>
             ))}

@@ -94,7 +94,8 @@ export const sendMessage = async (req, res) => {
             chatId,
             senderId,
             text,
-            image
+            image,
+            readBy: [senderId]
         });
 
         //Update latest message in chat
@@ -115,4 +116,35 @@ export const deleteMessageById = async (req, res) => {
 
 export const editMessageById = async (req, res) => {
     //TO-DO
-}
+};
+
+export const markMessagesAsRead = async (req, res) => {
+    const userId = req.user._id;
+    const { chatId } = req.params;
+
+    try {
+        const chat = await Chat.findById(chatId);
+        if (!chat) {
+            return res.status(404).json({ msg: 'Chat not found.' });
+        }
+
+        if (!chat.users.includes(userId)) {
+            return res.status(403).json({ msg: 'User unauthorized to read messages in this chat.' });
+        }
+
+        await Message.updateMany(
+            {
+                chatId,
+                readBy: {$ne: userId}
+            },
+            {
+                $addToSet: { readBy: userId }
+            }
+        );
+
+        res.status(200).json({ msg: 'Messages marked as read' });
+    } catch (error) {
+        console.log('Error in markMessagesAsRead: ', error.message);
+        res.status(500).json({ msg: 'Internal Server Error' });
+    }
+};
