@@ -44,7 +44,7 @@ io.on('connection', (socket) => {
 
     socket.on('send-message', ({ chatId, message }) => {
         // Emit to all users in the room (chatId = room name)
-        socket.to(chatId).emit('receive-message', { chatId, message });
+        socket.to(chatId).emit('get-new-message', { chatId, message });
     });
 
     socket.on('new-chat', (chat) => {

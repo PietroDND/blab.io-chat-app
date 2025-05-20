@@ -6,7 +6,7 @@ import { devtools } from 'zustand/middleware';
 import { useChatStore } from './chatStore.js';
 import { useUserStore } from './userStore.js';
 
-const debug = false;
+const debug = true;
 
 export const useAuthStore = create(devtools((set, get) => ({
     authUser: null,
@@ -133,10 +133,10 @@ export const useAuthStore = create(devtools((set, get) => ({
             useChatStore.getState().updateChatsList(chat);
         });
 
-        socket.on('receive-message', ({ chatId, message }) => {
+        socket.on('get-new-message', (message) => {
             // Update messages in chatStore
-            useChatStore.getState().addMessage(chatId, message);
-            useChatStore.getState().updateLatestMessages(chatId, message.text); // Optional
+            if (debug) console.log('New message got: ', message);
+            useChatStore.getState().appendMessage(message.chatId, message.message);
         });
 
         socket.on('disconnect', () => {

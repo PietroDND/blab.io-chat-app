@@ -34,26 +34,51 @@ const ChatInput = () => {
         e.preventDefault();
         if (!text.trim() && !imagePreview) return;
 
-        if (selectedUser && !selectedChat) {
-            try {
-                const createdChat = await createChat({users: [selectedUser._id]});
-                setSelectedChat(createdChat);
-            } catch (error) {
-                console.error("Failed to create chat:", error);
-          }
-        }
-    
-        try {
-          await sendMessage(selectedChat._id, {
-            text: text.trim(),
-            image: imagePreview,
-          });
-          // Clear form
+        const clearInput = () => {
           setText('');
           setImagePreview(null);
           if (fileInputRef.current) fileInputRef.current.value = '';
-        } catch (error) {
-          console.error("Failed to send message:", error);
+        };
+      
+        //Case 1: chat doesn't exist yet
+        if (selectedUser && !selectedChat) {
+            try {
+                const createdChat = await createChat({users: [selectedUser._id]});
+
+                if (!createdChat?._id) {
+                  toast.error("Chat creation failed");
+                  return;
+                }
+
+                setSelectedChat(createdChat);
+
+                await sendMessage(createdChat._id, {
+                  text: text.trim(),
+                  image: imagePreview,
+                });
+
+                clearInput();
+                return;
+            } catch (error) {
+                console.error('Error creating chat and sending first message', error.message);
+                toast.error("Something went wrong");
+          }
+        }
+        
+        //Case 2: chat already exists
+        if (selectedChat) {
+          try {
+            await sendMessage(selectedChat._id, {
+              text: text.trim(),
+              image: imagePreview,
+            });
+
+            clearInput();
+
+          } catch (error) {
+              console.error('Error sending message to existing chat', error.message);
+              toast.error("Message not sent");
+          }
         }
       };
 

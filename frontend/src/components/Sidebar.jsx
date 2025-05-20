@@ -2,7 +2,7 @@ import React from 'react'
 import { useAuthStore } from '../stores/authStore'
 import { useChatStore } from '../stores/chatStore';
 import { useUserStore } from '../stores/userStore';
-import { Users, MessageSquareText } from 'lucide-react'
+import { Users, MessageSquareText, Image } from 'lucide-react'
 import { formatChatTimeStamp } from '../utils/date';
 import SidebarSkeleton from './skeletons/SidebarSkeleton'
 
@@ -25,6 +25,30 @@ const Sidebar = () => {
       setSelectedChat(null);
     }
   };
+
+  const getLatestMessage = (chat) => {
+    if (!chat || !latestMessages[chat?._id]) return;
+
+    if (latestMessages[chat._id].image) {
+      if (latestMessages[chat._id].text) {
+        return(
+          <div className='flex gap-0.5 items-center'>
+            <Image className='size-4.5'/>
+            <span>{latestMessages[chat._id].text || chat.latestMessage.text}</span>
+          </div>
+        );
+      } else {
+        return(
+          <div className='flex gap-0.5 items-center'>
+            <Image className='size-4.5'/>
+            <span>Picture</span>
+          </div>
+        );
+      }
+    } else {
+      return latestMessages[chat._id].text || chat.latestMessage.text
+    }
+  }
 
   if(isUsersLoading || isChatsLoading) {
     return(
@@ -104,7 +128,7 @@ const Sidebar = () => {
                       <div className='text-xs text-gray-400'>{formatChatTimeStamp(latestMessages[chat._id]?.updatedAt)}</div>
                     </div>
                   </div>
-                  <div className='text-sm h-6 truncate text-gray-400'>{chat?.latestMessage?.text}</div>
+                  <div className='flex items-center text-sm h-6 text-gray-400 truncate w-45'>{getLatestMessage(chat)}</div>
                 </div>
               </button>
             ))}

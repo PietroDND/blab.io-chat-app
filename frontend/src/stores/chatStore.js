@@ -37,7 +37,7 @@ export const useChatStore = create((set, get) => ({
             if (state.messages[chatId]) return {}; // skip setting loading state
             return { isMessagesLoading: true };
         });
-
+        
         try {
             const res = await axiosInstance.get(`/chats/${chatId}/messages`);
             set((state) => ({ messages: {...state.messages, [chatId]: res.data.messages} }));
@@ -57,14 +57,13 @@ export const useChatStore = create((set, get) => ({
             };
 
             const res = await axiosInstance.post('/chats', payload);
+            get().updateChatsList(res.data);
 
             const socket = useAuthStore.getState().socket;
             if (!socket || !socket.connected) {
                 console.error('Socket not ready or connected.');
                 return;
             }
-            
-            get().updateChatsList(res.data);
             socket.emit('new-chat', res.data);
 
             return res.data;
@@ -82,8 +81,19 @@ export const useChatStore = create((set, get) => ({
 
         try {
             const res = await axiosInstance.post(`/chats/${chatId}/messages`, dataParsed);
+            get().appendMessage(chatId, res.data);
+
+            const socket = useAuthStore.getState().socket;
+            if (!socket || !socket.connected) {
+                console.error('Socket not ready or connected.');
+                return;
+            }
+            socket.emit('send-message', {
+                chatId,
+                message: res.data
+            });
         } catch (error) {
-            
+            toast.error('Error - message not sent');
         }
     },
 
@@ -104,5 +114,33 @@ export const useChatStore = create((set, get) => ({
         });
     },
 
+    appendMessage: (chatId, newMessage) => {
+        set((state) => {
+            const existingMessages = state.messages[chatId] || [];
+            const messageExists = existingMessages.some(msg => msg._id === newMessage._id);
+    
+            if (messageExists) {
+                // Message already exists, but still update latestMessages in case it's newer
+                return {
+                    latestMessages: {
+                        ...state.latestMessages,
+                        [chatId]: newMessage
+                    }
+                };
+            }
+    
+            return {
+                messages: {
+                    ...state.messages,
+                    [chatId]: [...existingMessages, newMessage]
+                },
+                latestMessages: {
+                    ...state.latestMessages,
+                    [chatId]: newMessage
+                }
+            };
+        });
+    },
+    
     setSelectedChat: (selectedChat) => set({ selectedChat })
 }));
