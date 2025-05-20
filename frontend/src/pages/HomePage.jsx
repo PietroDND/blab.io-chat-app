@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar'
 import ChatContainer from '../components/ChatContainer'
 import { useUserStore } from '../stores/userStore';
 import { useChatStore } from '../stores/chatStore';
+import ChatPlaceholder from '../components/ChatPlaceholder';
 
 const HomePage = () => {
   const { selectedChat } = useChatStore();
@@ -14,7 +15,7 @@ const HomePage = () => {
           <div className='flex h-full rounded-lg overflow-hidden'>
             <Sidebar />
             {(selectedChat || selectedUser) && <ChatContainer />}
-            {(!selectedChat && !selectedUser) && <div>Placeholder</div>}
+            {(!selectedChat && !selectedUser) && <ChatPlaceholder />}
           </div>
         </div>
       </div>
