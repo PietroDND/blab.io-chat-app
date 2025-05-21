@@ -10,6 +10,7 @@ export const useChatStore = create((set, get) => ({
     selectedChat: null,
     isMessagesLoading: false,
     isChatsLoading: false,
+    showInfoBox: false,
 
     getChats: async () => {
         set({ isChatsLoading: true });
@@ -72,6 +73,19 @@ export const useChatStore = create((set, get) => ({
         }
     },
 
+    editGroupChat: async (chatId, {groupName, groupPic}) => {
+        try {
+            const payload = {
+                ...(groupName && { groupName }),
+                ...(groupPic && { groupPic }),
+            };
+            const res = await axiosInstance.patch(`/chats/${chatId}`, payload);
+            get().updateChatsList(res.data);
+        } catch (error) {
+            toast.error(error.response.data.msg);
+        }
+    },
+
     sendMessage: async (chatId, data) => {
         const { text, image } = data;
         const dataParsed ={
@@ -99,20 +113,39 @@ export const useChatStore = create((set, get) => ({
 
     updateChatsList: (newChat) => {
         set((state) => {
-            const chatExist = state.chats.some(chat => chat._id === newChat._id);
-            if (chatExist) return {}; //No changes if chat already exist
+          const existingChat = state.chats.find(chat => chat._id === newChat._id);
+      
+          // If chat exists and hasn't changed, do nothing
+          if (existingChat) {
+            const isSameChat =
+              JSON.stringify(existingChat) === JSON.stringify(newChat);
+      
+            if (isSameChat) return {}; // No update needed
+          }
+      
+          let updatedChats;
+      
+          if (existingChat) {
+            // Replace existing chat with updated one
+            updatedChats = state.chats.map(chat =>
+              chat._id === newChat._id ? newChat : chat
+            );
+          } else {
+            // Add new chat
+            updatedChats = [...state.chats, newChat];
+          }
 
-            return {
-                chats: [...state.chats, newChat],
-                ...(newChat.latestMessage && {
-                    latestMessages: {
-                        ...state.latestMessages,
-                        [newChat._id]: newChat.latestMessage
-                    }
-                })
-            }
+          return {
+            chats: updatedChats,
+            ...(newChat.latestMessage && {
+              latestMessages: {
+                ...state.latestMessages,
+                [newChat._id]: newChat.latestMessage
+              }
+            })
+          };
         });
-    },
+    },  
 
     appendMessage: (chatId, newMessage) => {
         set((state) => {
@@ -177,5 +210,9 @@ export const useChatStore = create((set, get) => ({
         return messages.filter((msg) => msg.senderId !== userId && !msg.readBy.includes(userId)).length;
     },
     
-    setSelectedChat: (selectedChat) => set({ selectedChat })
+    setSelectedChat: (selectedChat) => set({ selectedChat }),
+
+    toggleInfoBox: () => set((state) => ({ showInfoBox: !state.showInfoBox })),
+
+    setShowInfoBox: (value) => set((state) => ({ showInfoBox: value }))
 }));

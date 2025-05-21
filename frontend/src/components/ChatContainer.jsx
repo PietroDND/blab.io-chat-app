@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import ChatHeader from './ChatHeader'
+import ChatInfoBox from './ChatInfoBox'
 import { useChatStore } from '../stores/chatStore';
 import { useUserStore } from '../stores/userStore';
 import ChatInput from './ChatInput';
@@ -8,8 +9,12 @@ import { useAuthStore } from '../stores/authStore';
 
 const ChatContainer = () => {
   const { authUser } = useAuthStore();
-  const { messages, getMessages, isMessagesLoading, selectedChat, markMessagesAsRead, markMessagesAsReadLocally } = useChatStore();
+  const { messages, getMessages, selectedChat, markMessagesAsRead, markMessagesAsReadLocally, showInfoBox, setShowInfoBox } = useChatStore();
   const { selectedUser } = useUserStore();
+
+  useEffect(() => {
+    setShowInfoBox(false);
+  }, [selectedChat, selectedUser]);
 
   useEffect(() => {
     if (!selectedChat) return;
@@ -28,10 +33,10 @@ const ChatContainer = () => {
   }, [selectedChat]);
 
   return (
-    <div className='flex-1'>
-      <div className='flex flex-col h-full'>
+    <div className='flex flex-1'>
+      <div className='flex flex-col flex-1 h-full w-1/2'>
         <ChatHeader />
-        <div className='flex-1 overflow-y-auto p-4 space-y-4'>
+        <div className='flex-1 overflow-x-hidden overflow-y-auto p-4 space-y-4'>
           {(messages[selectedChat?._id] || []).map((message) => (
             <div 
               key={message._id}
@@ -73,6 +78,7 @@ const ChatContainer = () => {
         <ChatInput />
 
       </div>
+      {showInfoBox && <ChatInfoBox />}
     </div>
   )
 }

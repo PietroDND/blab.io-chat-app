@@ -7,7 +7,7 @@ import { X, Info } from 'lucide-react';
 
 const ChatHeader = () => {
     const { authUser, isUserOnline, lastSeen } = useAuthStore();
-    const { selectedChat, setSelectedChat } = useChatStore();
+    const { chats, selectedChat, setSelectedChat, toggleInfoBox } = useChatStore();
     const { selectedUser, setSelectedUser } = useUserStore();
 
     const getHeaderPic = () => {
@@ -20,7 +20,10 @@ const ChatHeader = () => {
 
     const getHeaderName = () => {
         if (selectedUser) return selectedUser.username;
-        if (selectedChat && selectedChat.isGroupChat) return selectedChat.groupName;
+        if (selectedChat && selectedChat.isGroupChat) {
+            const targetChat = chats.find((chat) => chat._id === selectedChat._id);
+            return targetChat.groupName || selectedChat.groupName
+        };
         return selectedChat.users.find(user => user._id != authUser._id).username;
     };
 
@@ -60,7 +63,7 @@ const ChatHeader = () => {
           </div>
 
           <div className='flex gap-4'>
-            <button className='cursor-pointer' onClick={() => {setSelectedChat(null); setSelectedUser(null)}}>
+            <button className='cursor-pointer' onClick={() => toggleInfoBox()}>
               <Info />
             </button>
             <button className='cursor-pointer' onClick={() => {setSelectedChat(null); setSelectedUser(null)}}>

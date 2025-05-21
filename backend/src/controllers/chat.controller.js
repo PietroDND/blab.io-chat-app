@@ -9,7 +9,7 @@ export const getChats = async (req, res) => {
     const currentUserId = req.user._id;
     try {
         const chats = await Chat.find({ users: currentUserId })
-            .populate('users', 'username profilePic lastSeen')
+            .populate('users', 'username fullname profilePic lastSeen')
             .populate({
                 path: 'latestMessage',
                 populate: { path: 'senderId', select: 'username' }
@@ -184,14 +184,9 @@ export const updateChat = async (req, res) => {
         const isParticipant = chat.users.some((id) => {
             return id.toString() === currentUserId.toString();
         });
-        const isAdmin = chat.groupAdmins?.some((id) => {
-            return id.toString() === currentUserId.toString();
-        });
+
         if (!isParticipant) {
             return res.status(403).json({ msg: 'You are not authorized to update this chat.' });
-        }
-        if (chat.isGroupChat && !isAdmin) {
-            return res.status(403).json({ msg: 'Only group admins can modify group chats informations.' });
         }
 
         //Add new name to updatedInfo object
@@ -228,6 +223,10 @@ export const updateChat = async (req, res) => {
         await chat.save();
         await chat.populate('users', 'username profilePic');
         await chat.populate('groupAdmins', 'username');
+        await chat.populate({
+            path: 'latestMessage',
+            populate: { path: 'senderId', select: 'username' }
+        })
 
         res.status(200).json(chat);
     } catch (error) {
