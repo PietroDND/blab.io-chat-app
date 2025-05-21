@@ -131,7 +131,7 @@ const Sidebar = () => {
                         ? chat.groupName
                         : chat.users.find(user => user._id !== authUser._id)?.username
                         }</div>
-                      <div className='text-xs text-accent'>{formatChatTimeStamp(latestMessages[chat._id]?.updatedAt)}</div>
+                      <div className='text-xs text-accent'>{formatChatTimeStamp(latestMessages[chat._id]?.updatedAt || chat?.updatedAt)}</div>
                     </div>
                   </div>
                   <div className='flex justify-between items-center'>

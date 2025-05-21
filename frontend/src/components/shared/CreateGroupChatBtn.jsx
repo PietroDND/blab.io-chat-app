@@ -1,7 +1,6 @@
 import {
     CircleFadingPlus,
     MessagesSquare,
-    UserPlus,
     ChevronDown,
     ChevronUp,
   } from 'lucide-react';
@@ -18,7 +17,9 @@ import { useChatStore } from '../../stores/chatStore';
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [expand, setExpand] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
-  
+    const [nameError, setNameError] = useState(false);
+    const [usersError, setUsersError] = useState(false);
+
     const toggleUser = (id) => {
       setSelectedUsers((prev) =>
         prev.includes(id) ? prev.filter((uid) => uid !== id) : [...prev, id]
@@ -40,13 +41,16 @@ import { useChatStore } from '../../stores/chatStore';
     };
 
     const validateForm = () => {
+        setNameError(false);
+        setUsersError(false);
+
         if (!groupName || groupName === '') {
-            toast.error('Group name is required');
+            setNameError(true);
             return false;
         }
 
         if (selectedUsers.length < 2) {
-            toast.error('Select at least 2 users to start a group chat');
+            setUsersError(true);
             return false
         }
 
@@ -64,6 +68,16 @@ import { useChatStore } from '../../stores/chatStore';
 
         try {
             await createChat({users, groupName, groupPic});
+
+            //Close modal and clear the form
+            const modal = document.getElementById('my_modal_2');
+            if (modal) modal.close();
+            setGroupName('');
+            setSelectedUsers([]);
+            setSelectedImage(null);
+            setExpand(false);
+            toast.success('New group chat created');
+
         } catch (error) {
             console.error('Chat creation failed');
         }
@@ -98,6 +112,7 @@ import { useChatStore } from '../../stores/chatStore';
                     onChange={(e) => setGroupName(e.target.value)}
                   />
                 </label>
+                <span className={`text-error ${nameError ? 'block' : 'hidden'}`}>Please enter a name for the group chat</span>
               </fieldset>
   
               {/* Inline Multi-Select */}
@@ -149,6 +164,7 @@ import { useChatStore } from '../../stores/chatStore';
                     </div>
                   )}
                 </div>
+                <span className={`text-error ${usersError ? 'block' : 'hidden'}`}>Select at least 2 participants</span>
               </fieldset>
 
               <fieldset className="fieldset mb-5">
