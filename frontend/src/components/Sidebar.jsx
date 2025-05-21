@@ -2,9 +2,10 @@ import React from 'react'
 import { useAuthStore } from '../stores/authStore'
 import { useChatStore } from '../stores/chatStore';
 import { useUserStore } from '../stores/userStore';
-import { Users, MessageSquareText, Image } from 'lucide-react'
+import { Users, MessageSquareText, Image, MessageSquarePlus } from 'lucide-react'
 import { formatChatTimeStamp } from '../utils/date';
 import SidebarSkeleton from './skeletons/SidebarSkeleton'
+import CreateGroupChatBtn from './shared/CreateGroupChatBtn';
 
 const Sidebar = () => {
   const { authUser, isUserOnline } = useAuthStore();
@@ -46,9 +47,13 @@ const Sidebar = () => {
         );
       }
     } else {
-      return latestMessages[chat._id].text || chat.latestMessage.text
+      return latestMessages[chat._id].text || chat.latestMessage.text;
     }
   }
+
+  const createGroupChat = () => {
+    console.log('click');
+  };
 
   if(isUsersLoading || isChatsLoading) {
     return(
@@ -99,6 +104,7 @@ const Sidebar = () => {
             <span className="hidden lg:block">Chats</span>
           </div>
           <div className="collapse-content">
+            <CreateGroupChatBtn />
             {chats.map((chat) => (
               <button
                 key={chat._id}
