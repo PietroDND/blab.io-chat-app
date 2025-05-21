@@ -134,7 +134,7 @@ const ProfilePage = () => {
                 <User className="size-4" />
                 Full Name
               </div>
-              <p className="px-4 py-2.5 bg-base-200 text-gray-400 rounded-lg border cursor-not-allowed">{authUser?.fullname}</p>
+              <p className="px-4 py-2.5 bg-base-200 text-accent rounded-lg border cursor-not-allowed">{authUser?.fullname}</p>
             </div>
 
             <div className="space-y-1.5">
@@ -142,7 +142,7 @@ const ProfilePage = () => {
                 <Mail className="size-4" />
                 Email Address
               </div>
-              <p className="px-4 py-2.5 bg-base-200 text-gray-400 rounded-lg border cursor-not-allowed">{authUser?.email}</p>
+              <p className="px-4 py-2.5 bg-base-200 text-accent rounded-lg border cursor-not-allowed">{authUser?.email}</p>
             </div>
           </div>
 

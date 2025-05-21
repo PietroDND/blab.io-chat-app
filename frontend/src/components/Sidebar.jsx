@@ -86,7 +86,7 @@ const Sidebar = () => {
                   <div className='flex justify-between'>
                     <div className='font-medium truncate'>{user.username}</div>
                   </div>
-                  <div className='text-sm h-6 truncate text-gray-400'>{user.fullname}</div>
+                  <div className='text-sm h-6 truncate text-accent'>{user.fullname}</div>
                 </div>
               </button>
             ))}
@@ -125,13 +125,13 @@ const Sidebar = () => {
                         ? chat.groupName
                         : chat.users.find(user => user._id !== authUser._id)?.username
                         }</div>
-                      <div className='text-xs text-gray-400'>{formatChatTimeStamp(latestMessages[chat._id]?.updatedAt)}</div>
+                      <div className='text-xs text-accent'>{formatChatTimeStamp(latestMessages[chat._id]?.updatedAt)}</div>
                     </div>
                   </div>
                   <div className='flex justify-between items-center'>
-                    <div className='flex items-center text-sm h-6 text-gray-400 truncate w-35'>{getLatestMessage(chat)}</div>
+                    <div className='flex items-center text-sm h-6 text-accent truncate w-35'>{getLatestMessage(chat)}</div>
                     <div 
-                      className={`bg-primary size-5 rounded-full p-3 text-sm justify-center items-center ${getUnreadCount(chat._id) > 0 ? 'flex' : 'hidden'}`}
+                      className={`bg-primary text-white size-5 rounded-full p-3 text-sm justify-center items-center ${getUnreadCount(chat._id) > 0 ? 'flex' : 'hidden'}`}
                     >
                       {getUnreadCount(chat._id)}
                     </div>

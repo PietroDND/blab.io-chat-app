@@ -6,8 +6,8 @@ const ChatPlaceholder = () => {
     <div className='flex flex-1 justify-center items-center'>
         <div className='flex flex-col items-center gap-2'>
             <AppLogo animate={true}/>
-            <span className='font-bold text-xl text-gray-200'>Welcome to Blab.io!</span>
-            <span className='text-gray-200 text-sm'>Select a chat from the sidebar</span>
+            <span className='font-bold text-xl text-base-content/90'>Welcome to Blab.io!</span>
+            <span className='text-sm text-base-content/80'>Select a chat from the sidebar</span>
         </div>
     </div>
   )

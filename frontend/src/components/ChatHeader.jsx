@@ -28,7 +28,7 @@ const ChatHeader = () => {
         if (selectedUser) {
             const status = isUserOnline(selectedUser._id) 
                 ? <p className='text-xs text-success'>Online</p> 
-                : <p className='text-xs text-gray-400'>{`Last seen ${formatChatTimeStamp(lastSeen[selectedUser._id] || selectedUser.lastSeen)}`}</p>;
+                : <p className='text-xs text-accent'>{`Last seen ${formatChatTimeStamp(lastSeen[selectedUser._id] || selectedUser.lastSeen)}`}</p>;
             return status;
         }
         if (selectedChat && selectedChat.isGroupChat) {
@@ -36,12 +36,12 @@ const ChatHeader = () => {
             for(const user of selectedChat.users) {
                 if (isUserOnline(user._id)) onlineCounter ++;
             }
-            return(<p className='text-xs text-gray-400'>Online users: {onlineCounter}</p>);
+            return(<p className='text-xs text-accent'>Online users: {onlineCounter}</p>);
         }
         const userToCheck = selectedChat.users.find(user => user._id != authUser._id);
         const status = isUserOnline(userToCheck._id) 
             ? <p className='text-sm text-success'>Online</p> 
-            : <p className='text-xs text-gray-400'>{`Last seen ${formatChatTimeStamp(lastSeen[userToCheck._id] || userToCheck.lastSeen)}`}</p>;
+            : <p className='text-xs text-accent'>{`Last seen ${formatChatTimeStamp(lastSeen[userToCheck._id] || userToCheck.lastSeen)}`}</p>;
         return status;
     };
 

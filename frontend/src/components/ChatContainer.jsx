@@ -56,7 +56,7 @@ const ChatContainer = () => {
                 </div>
                 <div className="chat-bubble flex flex-col">
                   {selectedChat.isGroupChat && (
-                    <span className='text-sm text-gray-400'>{message.senderId.username}</span>
+                    <span className='text-sm text-accent'>{message.senderId.username}</span>
                   )}
                   {message.image && (
                     <img
