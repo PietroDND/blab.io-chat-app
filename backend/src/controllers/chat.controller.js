@@ -191,15 +191,17 @@ export const updateChat = async (req, res) => {
 
         //Add new name to updatedInfo object
         if (groupName && groupName.length > 0 && groupName.trim() !== '') updatedInfo.groupName = groupName;
-
         //Handle image modification
         if (groupPic) {
-            if (chat.isGroupChat && chat.groupPic && chat.groupPic !== DEFAULT_GROUP_PIC_URL) {
-                const groupPicPublicId = chat.groupPic.split('/').slice(7).join('/').split('.')[0];
-                try {
-                    await cloudinary.uploader.destroy(groupPicPublicId); // Delete from Cloudinary
-                } catch (error) {
-                    console.error('Error deleting group picture from Cloudinary: ', error.message);
+            if (chat.isGroupChat) {
+
+                if (chat.groupPic && chat.groupPic !== DEFAULT_GROUP_PIC_URL) {
+                    const groupPicPublicId = chat.groupPic.split('/').slice(7).join('/').split('.')[0];
+                        try {
+                            await cloudinary.uploader.destroy(groupPicPublicId); // Delete from Cloudinary
+                        } catch (error) {
+                            console.error('Error deleting group picture from Cloudinary: ', error.message);
+                        }
                 }
 
                 try {

@@ -14,6 +14,15 @@ const ChatInfoBox = () => {
   const [editedGroupName, setEditedGroupName] = useState(selectedChat.groupName);
   const editableRef = useRef(null);
 
+  const getImageSrc = () => {
+    if (selectedChat.isGroupChat) {
+      const targetChat = chats.find((chat) => chat._id === selectedChat._id);
+      return targetChat?.groupPic || selectedChat.groupPic;
+    } else {
+      return selectedChat.users.find((user) => user._id !== authUser._id).profilePic;
+    }
+  };
+
   const handleEditClick = () => {
     setIsEditingGroupName(true);
     setTimeout(() => editableRef.current?.focus(), 0); // Focus after render
@@ -42,6 +51,20 @@ const ChatInfoBox = () => {
     setIsEditingGroupName(false);
   };
 
+  const handleImageEdit = async (e) => {
+    const imageFile = e.target.files[0];
+    if (!imageFile) return;
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(imageFile);
+
+    reader.onload = async () => {
+      const base64Image = reader.result;
+      await editGroupChat(selectedChat._id, {groupPic: base64Image});
+    };
+  };
+
   return (
     <div className='w-1/2 border-l border-base-300 space-y-4'>
       <div id="header" className='h-[71px] flex items-center justify-between p-4 border-b border-base-300'>
@@ -54,11 +77,7 @@ const ChatInfoBox = () => {
         <div className="flex flex-col items-center gap-5">
           <div className="relative">
             <img
-              src={
-                selectedChat.isGroupChat ?
-                selectedChat.groupPic :
-                selectedChat.users.find((user) => user._id !== authUser._id).profilePic
-              }
+              src={getImageSrc()}
               alt="Profile"
               className="size-24 rounded-full object-cover border-4"
             />
@@ -78,6 +97,7 @@ const ChatInfoBox = () => {
                   id="group-image-upload"
                   className="hidden"
                   accept="image/*"
+                  onChange={handleImageEdit}
                 />
               </label>
             )}

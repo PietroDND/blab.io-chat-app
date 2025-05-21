@@ -13,7 +13,10 @@ const ChatHeader = () => {
     const getHeaderPic = () => {
         if(selectedUser) return selectedUser.profilePic;
         if (selectedChat) {
-            if (selectedChat.isGroupChat) return selectedChat.groupPic;
+            if (selectedChat.isGroupChat) {
+                const targetChat = chats.find((chat) => chat._id === selectedChat._id);
+                return targetChat.groupPic || selectedChat.groupPic;
+            }
             return selectedChat.users.find(user => user._id != authUser._id).profilePic;
         }
     };
