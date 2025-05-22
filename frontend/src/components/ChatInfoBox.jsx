@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useChatStore } from '../stores/chatStore'
-import { useUserStore } from '../stores/userStore';
 import { ArrowRightToLine, Camera, CircleArrowLeft, CircleArrowRight, ImageUp, SquarePen, Trash2 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { formatDate } from '../utils/date';
@@ -8,7 +7,7 @@ import toast from 'react-hot-toast';
 
 const ChatInfoBox = () => {
   const { authUser } = useAuthStore();
-  const { chats, messages, selectedChat, setShowInfoBox, editGroupChat, chatImages } = useChatStore();
+  const { chats, selectedChat, setShowInfoBox, editGroupChat, chatImages } = useChatStore();
   const [isEditingGroupName, setIsEditingGroupName] = useState(false);
   const [editedGroupName, setEditedGroupName] = useState(selectedChat.groupName);
   const editableRef = useRef(null);
@@ -84,135 +83,170 @@ const ChatInfoBox = () => {
     }
   };
 
+  console.log(selectedChat)
+
   return (
-    <div className='w-1/2 border-l border-base-300 space-y-4'>
+    <div className='w-1/2 border-l border-base-300 flex flex-col'>
       <div id="header" className='h-[71px] flex items-center justify-between p-4 border-b border-base-300'>
         <h3 className='font-medium'>{selectedChat?.isGroupChat ? 'Group info' : 'Contact info'}</h3>
         <button className='btn btn-ghost' onClick={() => setShowInfoBox(false)}>
           <ArrowRightToLine />
         </button>
       </div>
-      <div id='main-info' className='border-b border-base-300'>
-        <div className="flex flex-col items-center gap-5">
-          <div className="relative">
-            <img
-              src={getImageSrc()}
-              alt="Profile"
-              className="size-24 rounded-full object-cover border-4"
-            />
-            {selectedChat?.isGroupChat && (
-              <details ref={dropdownRef} className="dropdown dropdown-center absolute -bottom-1 -right-3">
-                <summary className="btn btn-circle btn-secondary">
-                  <Camera className='text-base-200' />
-                </summary>
-                  <ul className="menu dropdown-content bg-base-100 rounded-box z-1 w-39 p-2 shadow-sm">
-                    <li>
-                      <label htmlFor="group-image-upload">
-                        <ImageUp className='size-5'/>
-                        Upload image
-                        <input
-                          type="file"
-                          id="group-image-upload"
-                          className="hidden"
-                          accept="image/*"
-                          onChange={handleImageEdit}
-                        />
-                      </label>
-                    </li>
-                    <li>
-                      <button onClick={handleImageReset}>
-                        <Trash2 className='size-5'/>
-                        Delete image
-                      </button>
-                    </li>
-                  </ul>
-              </details>
-            )}
-          </div>
-          <div className='flex flex-col items-center mb-4'>
-            <div className='flex items-center gap-1'>
-
-              {!selectedChat?.isGroupChat && (
-                <span className='font-medium text-lg px-1'>
-                  {selectedChat.users.find((user) => user._id !== authUser._id).username}
-                </span>
-              )}
-
+      <div id='container' className='overflow-y-auto'>
+        <div id='main-info' className='border-b border-base-300 mb-3'>
+          <div className="flex flex-col items-center gap-5 mt-3">
+            <div className="relative">
+              <img
+                src={getImageSrc()}
+                alt="Profile"
+                className="size-24 rounded-full object-cover border-4"
+              />
               {selectedChat?.isGroupChat && (
-                <span
-                ref={editableRef} 
-                contentEditable={isEditingGroupName}
-                suppressContentEditableWarning={true}
-                className={`font-medium text-lg px-1 rounded ${isEditingGroupName ? 'border border-accent outline-none' : ''}`}
-                >
-                  {editedGroupName}
-                </span>
-              )}
-
-              {selectedChat?.isGroupChat && !isEditingGroupName && (
-                <button onClick={handleEditClick} className='btn btn-xs btn-ghost'>
-                  <SquarePen className='size-4' />
-                </button>
+                <details ref={dropdownRef} className="dropdown dropdown-center absolute -bottom-1 -right-3">
+                  <summary className="btn btn-circle btn-secondary">
+                    <Camera className='text-base-200' />
+                  </summary>
+                    <ul className="menu dropdown-content bg-base-100 rounded-box z-1 w-39 p-2 shadow-sm">
+                      <li>
+                        <label htmlFor="group-image-upload">
+                          <ImageUp className='size-5'/>
+                          Upload image
+                          <input
+                            type="file"
+                            id="group-image-upload"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleImageEdit}
+                          />
+                        </label>
+                      </li>
+                      <li>
+                        <button onClick={handleImageReset}>
+                          <Trash2 className='size-5'/>
+                          Delete image
+                        </button>
+                      </li>
+                    </ul>
+                </details>
               )}
             </div>
-            {isEditingGroupName && (
-              <div className='flex my-2 gap-2'>
-                <button onClick={handleSaveGroupName} className='btn btn-xs btn-success w-1/2'>
-                  Save
-                </button>
-                <button onClick={handleCancelEdit} className='btn btn-xs btn-error w-1/2'>
-                  Cancel
-                </button>
+            <div className='flex flex-col items-center mb-5'>
+              <div className='flex items-center gap-1'>
+
+                {!selectedChat?.isGroupChat && (
+                  <span className='font-medium text-lg px-1'>
+                    {selectedChat.users.find((user) => user._id !== authUser._id).username}
+                  </span>
+                )}
+
+                {selectedChat?.isGroupChat && (
+                  <span
+                  ref={editableRef} 
+                  contentEditable={isEditingGroupName}
+                  suppressContentEditableWarning={true}
+                  className={`font-medium text-lg px-1 rounded ${isEditingGroupName ? 'border border-accent outline-none' : ''}`}
+                  >
+                    {editedGroupName}
+                  </span>
+                )}
+
+                {selectedChat?.isGroupChat && !isEditingGroupName && (
+                  <button onClick={handleEditClick} className='btn btn-xs btn-ghost'>
+                    <SquarePen className='size-4' />
+                  </button>
+                )}
               </div>
-            )}
-            <span className='text-accent mb-1'>
-              {selectedChat.isGroupChat ?
-              'Group - ' + selectedChat.users.length + ' members' :
-              selectedChat.users.find((user) => user._id !== authUser._id).fullname}
-            </span>
-            {selectedChat.isGroupChat && (
-              <span className='text-primary text-xs'>Group created on {formatDate(selectedChat?.createdAt)}</span>
-            )}
+              {isEditingGroupName && (
+                <div className='flex my-2 gap-2'>
+                  <button onClick={handleSaveGroupName} className='btn btn-xs btn-success w-1/2'>
+                    Save
+                  </button>
+                  <button onClick={handleCancelEdit} className='btn btn-xs btn-error w-1/2'>
+                    Cancel
+                  </button>
+                </div>
+              )}
+              <span className='text-accent'>
+                {selectedChat.isGroupChat ?
+                'Group - ' + selectedChat.users.length + ' members' :
+                selectedChat.users.find((user) => user._id !== authUser._id).fullname}
+              </span>
+              {selectedChat.isGroupChat && (
+                <span className='text-primary text-xs'>Group created on {formatDate(selectedChat?.createdAt)}</span>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-      <div id="media" className='px-4'>
-        {chatImages.length === 0 ? (
-          <p className='text-sm text-accent'>No media shared yet.</p>
-        ) : (
-          <div>
-            <span className='text-accent mb-4 text-sm'>Shared pictures</span>
-            <div className='relative flex mt-4'>
-              <div className='flex h-full absolute -left-3 items-center'>
-                <button
-                  className='btn btn-circle'
-                  onClick={() => setCurrentIndex(prev => Math.max(prev - 1, 0))}
-                  disabled={currentIndex === 0}
-                >
-                  <CircleArrowLeft className='size-8' />
-                </button>
-              </div>
+        <div id="media" className='px-4 border-b border-base-300 mb-3'>
+          {chatImages.length === 0 ? (
+            <p className='text-sm text-accent mb-5'>No media shared yet.</p>
+          ) : (
+            <div className='mb-5'>
+              <span className='text-accent mb-4 text-sm'>Shared pictures</span>
+              <div className='relative flex mt-5'>
+                <div className='flex h-full absolute -left-3 items-center'>
+                  <button
+                    className='btn btn-circle'
+                    onClick={() => setCurrentIndex(prev => Math.max(prev - 1, 0))}
+                    disabled={currentIndex === 0}
+                  >
+                    <CircleArrowLeft className='size-8' />
+                  </button>
+                </div>
 
-              <div className='flex overflow-hidden gap-2 w-full justify-center'>
-                {chatImages.slice(currentIndex, currentIndex + 3).map((src, index) => (
-                  <img
-                    key={index} 
-                    src={src.image} 
-                    alt={`chat-media-${index}`}
-                    className='size-24 object-cover rounded-lg border' 
-                  />
-                ))}
-              </div>
+                <div className='flex overflow-hidden gap-2 w-full justify-center'>
+                  {chatImages.slice(currentIndex, currentIndex + 3).map((src, index) => (
+                    <img
+                      key={index} 
+                      src={src.image} 
+                      alt={`chat-media-${index}`}
+                      className='size-24 object-cover rounded-lg border' 
+                    />
+                  ))}
+                </div>
 
-              <div className='flex h-full absolute -right-3 items-center'>
-                <button
-                  className='btn btn-circle'
-                  onClick={() => setCurrentIndex(prev => Math.min(prev + 1, chatImages.length - 3))}
-                  disabled={currentIndex + 3 >= chatImages.length}
-                >
-                  <CircleArrowRight className='size-8' />
-                </button>
+                <div className='flex h-full absolute -right-3 items-center'>
+                  <button
+                    className='btn btn-circle'
+                    onClick={() => setCurrentIndex(prev => Math.min(prev + 1, chatImages.length - 3))}
+                    disabled={currentIndex + 3 >= chatImages.length}
+                  >
+                    <CircleArrowRight className='size-8' />
+                  </button>
+                </div>
               </div>
+            </div>
+          )}
+        </div>
+        {selectedChat.isGroupChat && (
+          <div id='group-members' className='px-4 border-b border-base-300'>
+            <span className='text-accent text-sm'>Members</span>
+            <div className='mb-5'>
+              {selectedChat.users.map((user) => (
+                <button
+                  key={user._id}
+                  className='w-full py-2 lg:p-3 flex items-center gap-3 hover:bg-base-300 transition-colors mb-1 cursor-pointer'
+                >
+                  <div className='relative'>
+                    <img 
+                      src={user.profilePic || '/avatar.png'} 
+                      alt={`${user.username} Avatar`}
+                      className='size-12 object-cover rounded-lg'
+                    />
+                  </div>
+                  {/* User Info */}
+                  <div className='flex-1 text-left flex justify-between items-center'>
+                    <div>
+                      <div className='font-medium truncate'>{user.username}</div>
+                      <div className='text-sm h-6 truncate text-accent'>{user.fullname}</div>
+                    </div>
+                    {selectedChat.groupAdmins.includes(user._id) && (
+                      <div className='badge badge-warning text-black'>Admin</div>
+                    )}
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
         )}
