@@ -67,6 +67,36 @@ export const getMessageById = async (req, res) => {
     }
 };
 
+export const getChatImages = async (req, res) => {
+    const currentUserId = req.user._id;
+    const { chatId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(chatId)) {
+        return res.status(400).json({ msg: 'Invalid chat ID.' });
+    }
+
+    try {
+        const chat = await Chat.findById(chatId);
+        if (!chat) {
+            return res.status(404).json({ msg: 'Chat not found.' });
+        }
+
+        if (!chat.users.includes(currentUserId)) {
+            return res.status(403).json({ msg: 'User unauthorized to retrieve messages from this chat.' });
+        }
+
+        const imageMessages = await Message.find({
+            chatId,
+            image: { $exists: true, $ne: '' }
+        }).select('image createdAt');
+
+        res.status(200).json(imageMessages);
+    } catch (error) {
+        console.error(`Error in getChatImages for user ${currentUserId} in chat ${chatId}: `, error.message);
+        res.status(500).json({ msg: "Internal Server Error" });
+    }
+};
+
 export const sendMessage = async (req, res) => {
     const { text, image } = req.body;
     const senderId = req.user._id;

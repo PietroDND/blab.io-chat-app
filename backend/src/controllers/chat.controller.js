@@ -194,7 +194,6 @@ export const updateChat = async (req, res) => {
         //Handle image modification
         if (groupPic) {
             if (chat.isGroupChat) {
-
                 if (chat.groupPic && chat.groupPic !== DEFAULT_GROUP_PIC_URL) {
                     const groupPicPublicId = chat.groupPic.split('/').slice(7).join('/').split('.')[0];
                         try {
@@ -204,13 +203,17 @@ export const updateChat = async (req, res) => {
                         }
                 }
 
-                try {
-                    const result = await cloudinary.uploader.upload(groupPic, { 
-                        folder: 'chat-group-avatars'
-                    });
-                    updatedInfo.groupPic = result.secure_url;
-                } catch (error) {
-                    console.warn('Cloudinary upload failed, using default groupPic:', error.message);
+                if (groupPic === 'RESET') {
+                    updatedInfo.groupPic = DEFAULT_GROUP_PIC_URL;
+                } else {
+                    try {
+                        const result = await cloudinary.uploader.upload(groupPic, { 
+                            folder: 'chat-group-avatars'
+                        });
+                        updatedInfo.groupPic = result.secure_url;
+                    } catch (error) {
+                        console.warn('Cloudinary upload failed, using default groupPic:', error.message);
+                    }
                 }
             }
         }

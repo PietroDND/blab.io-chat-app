@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { useChatStore } from '../stores/chatStore'
 import { useUserStore } from '../stores/userStore';
-import { ArrowRightToLine, Camera, SquarePen } from 'lucide-react';
+import { ArrowRightToLine, Camera, ImageUp, SquarePen, Trash2 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { formatDate } from '../utils/date';
 import toast from 'react-hot-toast';
@@ -9,10 +9,10 @@ import toast from 'react-hot-toast';
 const ChatInfoBox = () => {
   const { authUser } = useAuthStore();
   const { chats, selectedChat, setShowInfoBox, editGroupChat } = useChatStore();
-  const { selectedUser } = useUserStore();
   const [isEditingGroupName, setIsEditingGroupName] = useState(false);
   const [editedGroupName, setEditedGroupName] = useState(selectedChat.groupName);
   const editableRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   const getImageSrc = () => {
     if (selectedChat.isGroupChat) {
@@ -61,8 +61,26 @@ const ChatInfoBox = () => {
 
     reader.onload = async () => {
       const base64Image = reader.result;
-      await editGroupChat(selectedChat._id, {groupPic: base64Image});
+      try {
+        await editGroupChat(selectedChat._id, {groupPic: base64Image});
+        dropdownRef.current?.removeAttribute('open');
+        toast.success('Group image updated');
+      } catch (error) {
+        console.error('Group image update failed: ', error.message);
+        toast.error('Group image update failed');
+      }
     };
+  };
+
+  const handleImageReset = async (e) => {
+    try {
+      await editGroupChat(selectedChat._id, {groupPic: 'RESET'});
+      dropdownRef.current?.removeAttribute('open');
+      toast.success('Group image deleted');
+    } catch (error) {
+      console.error('Group image deletion failed: ', error.message);
+      toast.error('Group image deletion failed');
+    }
   };
 
   return (
@@ -82,24 +100,32 @@ const ChatInfoBox = () => {
               className="size-24 rounded-full object-cover border-4"
             />
             {selectedChat?.isGroupChat && (
-              <label
-                htmlFor="group-image-upload"
-                className={`
-                  absolute bottom-0 right-0 
-                  bg-base-content hover:scale-105
-                  p-2 rounded-full cursor-pointer 
-                  transition-all duration-200
-                `}
-              >
-                <Camera className="size-4 text-base-200" />
-                <input
-                  type="file"
-                  id="group-image-upload"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleImageEdit}
-                />
-              </label>
+              <details ref={dropdownRef} className="dropdown dropdown-center absolute -bottom-1 -right-3">
+                <summary className="btn btn-circle btn-secondary">
+                  <Camera className='text-base-200' />
+                </summary>
+                  <ul className="menu dropdown-content bg-base-100 rounded-box z-1 w-39 p-2 shadow-sm">
+                    <li>
+                      <label htmlFor="group-image-upload">
+                        <ImageUp className='size-5'/>
+                        Upload image
+                        <input
+                          type="file"
+                          id="group-image-upload"
+                          className="hidden"
+                          accept="image/*"
+                          onChange={handleImageEdit}
+                        />
+                      </label>
+                    </li>
+                    <li>
+                      <button onClick={handleImageReset}>
+                        <Trash2 className='size-5'/>
+                        Delete image
+                      </button>
+                    </li>
+                  </ul>
+              </details>
             )}
           </div>
           <div className='flex flex-col items-center mb-4'>
@@ -127,17 +153,17 @@ const ChatInfoBox = () => {
                   <SquarePen className='size-4' />
                 </button>
               )}
-              {isEditingGroupName && (
-                <>
-                  <button onClick={handleSaveGroupName} className='btn btn-xs btn-success'>
-                    Save
-                  </button>
-                  <button onClick={handleCancelEdit} className='btn btn-xs btn-ghost'>
-                    Cancel
-                  </button>
-                </>
-              )}
             </div>
+            {isEditingGroupName && (
+              <div className='flex my-2 gap-2'>
+                <button onClick={handleSaveGroupName} className='btn btn-xs btn-success w-1/2'>
+                  Save
+                </button>
+                <button onClick={handleCancelEdit} className='btn btn-xs btn-error w-1/2'>
+                  Cancel
+                </button>
+              </div>
+            )}
             <span className='text-accent mb-1'>
               {selectedChat.isGroupChat ?
               'Group - ' + selectedChat.users.length + ' members' :
