@@ -6,8 +6,8 @@ import { getOrCreateChat } from '../middleware/chat.middleware.js';
 const router = express.Router({ mergeParams: true });
 
 router.get('/', protectRoute, getMessages);
-router.get('/:messageId', protectRoute, getMessageById);
 router.get('/images', protectRoute, getChatImages);
+router.get('/:messageId', protectRoute, getMessageById);
 router.post('/', protectRoute, sendMessage);
 router.put('/mark-as-read', protectRoute, markMessagesAsRead);
 router.patch('/:messageId', protectRoute, editMessageById);

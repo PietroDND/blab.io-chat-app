@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import Chat from '../models/chat.model.js';
 import Message from '../models/message.model.js'
-import { getReceiverSocketId } from '../lib/socket.js';
+import cloudinary from '../lib/cloudinary.js';
 
 export const getMessages = async (req, res) => {
     //TO-DO: PAGINATION
@@ -88,7 +88,8 @@ export const getChatImages = async (req, res) => {
         const imageMessages = await Message.find({
             chatId,
             image: { $exists: true, $ne: '' }
-        }).select('image createdAt');
+        }).select('image senderId createdAt')
+        .populate('senderId', 'username');
 
         res.status(200).json(imageMessages);
     } catch (error) {
@@ -120,11 +121,24 @@ export const sendMessage = async (req, res) => {
             return res.status(403).json({ msg: 'User unauthorized to send messages in this chat.' });
         }
 
+        let uploadedImage;
+
+        if (image) {
+            try {
+                const result = await cloudinary.uploader.upload(image, { 
+                    folder: `${chat._id}-chat-images-folder`
+                });
+                uploadedImage = result.secure_url;
+            } catch (error) {
+                console.warn('Cloudinary upload failed:', error.message);
+            }
+        }
+
         const newMessage = await Message.create({
             chatId,
             senderId,
             text,
-            image,
+            image: uploadedImage || image,
             readBy: [senderId]
         });
 
