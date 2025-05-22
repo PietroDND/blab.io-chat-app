@@ -9,7 +9,7 @@ import { useAuthStore } from '../stores/authStore';
 
 const ChatContainer = () => {
   const { authUser } = useAuthStore();
-  const { messages, getMessages, selectedChat, markMessagesAsRead, markMessagesAsReadLocally, showInfoBox, setShowInfoBox } = useChatStore();
+  const { messages, getMessages, selectedChat, markMessagesAsRead, markMessagesAsReadLocally, showInfoBox, setShowInfoBox, getImages } = useChatStore();
   const { selectedUser } = useUserStore();
 
   useEffect(() => {
@@ -18,6 +18,14 @@ const ChatContainer = () => {
 
   useEffect(() => {
     if (!selectedChat) return;
+
+    const fetchImages = async () => {
+      try {
+        await getImages(selectedChat._id);
+      } catch (error) {
+        console.error("Failed to fetch chat images", error);
+      }
+    };
 
     const loadMessagesAndMarkAsRead = async () => {
       try {
@@ -30,6 +38,7 @@ const ChatContainer = () => {
     };
 
     loadMessagesAndMarkAsRead();
+    fetchImages();
   }, [selectedChat]);
 
   return (

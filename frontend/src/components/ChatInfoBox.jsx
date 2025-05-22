@@ -1,18 +1,19 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useChatStore } from '../stores/chatStore'
 import { useUserStore } from '../stores/userStore';
-import { ArrowRightToLine, Camera, ImageUp, SquarePen, Trash2 } from 'lucide-react';
+import { ArrowRightToLine, Camera, CircleArrowLeft, CircleArrowRight, ImageUp, SquarePen, Trash2 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { formatDate } from '../utils/date';
 import toast from 'react-hot-toast';
 
 const ChatInfoBox = () => {
   const { authUser } = useAuthStore();
-  const { chats, selectedChat, setShowInfoBox, editGroupChat } = useChatStore();
+  const { chats, messages, selectedChat, setShowInfoBox, editGroupChat, chatImages } = useChatStore();
   const [isEditingGroupName, setIsEditingGroupName] = useState(false);
   const [editedGroupName, setEditedGroupName] = useState(selectedChat.groupName);
   const editableRef = useRef(null);
   const dropdownRef = useRef(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const getImageSrc = () => {
     if (selectedChat.isGroupChat) {
@@ -175,7 +176,46 @@ const ChatInfoBox = () => {
           </div>
         </div>
       </div>
-      <div id="info-and-media" className='px-4'>
+      <div id="media" className='px-4'>
+        {chatImages.length === 0 ? (
+          <p className='text-sm text-accent'>No media shared yet.</p>
+        ) : (
+          <div>
+            <span className='text-accent mb-4 text-sm'>Shared pictures</span>
+            <div className='relative flex mt-4'>
+              <div className='flex h-full absolute -left-3 items-center'>
+                <button
+                  className='btn btn-circle'
+                  onClick={() => setCurrentIndex(prev => Math.max(prev - 1, 0))}
+                  disabled={currentIndex === 0}
+                >
+                  <CircleArrowLeft className='size-8' />
+                </button>
+              </div>
+
+              <div className='flex overflow-hidden gap-2 w-full justify-center'>
+                {chatImages.slice(currentIndex, currentIndex + 3).map((src, index) => (
+                  <img
+                    key={index} 
+                    src={src.image} 
+                    alt={`chat-media-${index}`}
+                    className='size-24 object-cover rounded-lg border' 
+                  />
+                ))}
+              </div>
+
+              <div className='flex h-full absolute -right-3 items-center'>
+                <button
+                  className='btn btn-circle'
+                  onClick={() => setCurrentIndex(prev => Math.min(prev + 1, chatImages.length - 3))}
+                  disabled={currentIndex + 3 >= chatImages.length}
+                >
+                  <CircleArrowRight className='size-8' />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

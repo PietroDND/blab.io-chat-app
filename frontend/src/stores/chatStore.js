@@ -5,10 +5,12 @@ import { useAuthStore } from './authStore.js';
 
 export const useChatStore = create((set, get) => ({
     chats: [],
+    chatImages: [],
     messages: {},
     latestMessages: {},
     selectedChat: null,
     isMessagesLoading: false,
+    isImagesLoading: false,
     isChatsLoading: false,
     showInfoBox: false,
 
@@ -46,6 +48,19 @@ export const useChatStore = create((set, get) => ({
             toast.error(error?.response?.data?.msg || 'Failed to fetch messages');
         } finally {
             set({ isMessagesLoading: false });
+        }
+    },
+
+    getImages: async (chatId) => {
+        set({ isImagesLoading: true });
+        
+        try {
+            const res = await axiosInstance.get(`/chats/${chatId}/messages/images`);
+            set({ chatImages: res.data });
+        } catch (error) {
+            toast.error(error?.response?.data?.msg || 'Failed to fetch images');
+        } finally {
+            set({ isImagesLoading: false });
         }
     },
 
