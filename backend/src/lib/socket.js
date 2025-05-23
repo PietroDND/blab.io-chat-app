@@ -64,6 +64,7 @@ io.on('connection', (socket) => {
 
     socket.on('leave-group-chat', (chatId) => {
         socket.leave(chatId);
+        io.to(chatId).emit('user-left-group-chat', chatId);
     });
 
     socket.on('disconnect', async () => {

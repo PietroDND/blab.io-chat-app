@@ -35,6 +35,16 @@ export const useChatStore = create((set, get) => ({
         }
     },
 
+    getChatById: async (chatId) => {
+        try {
+            const res = await axiosInstance.get(`/chats/${chatId}`);
+            get().updateChatsList(res.data);
+        } catch (error) {
+            toast.error(error.response.data.msg);
+            return null;
+        }
+    },
+
     getMessages: async (chatId) => {
         set((state) => {
             if (state.messages[chatId]) return {}; // skip setting loading state
@@ -111,18 +121,7 @@ export const useChatStore = create((set, get) => ({
                 return;
             }
             socket.emit('leave-group-chat', chatId);
-
-            set((state) => {
-                const updatedChats = state.chats.filter(chat => chat._id !== chatId);
-                const updatedMessages = { ...state.messages };
-                delete updatedMessages[chatId];
-
-                return {
-                    selectedChat: null,
-                    chats: updatedChats,
-                    messages: updatedMessages
-                };
-            });
+            get().removeChatFromList(chatId);
         } catch (error) {
             toast.error(error.response.data.msg || 'Failed to leave group chat');
         }
@@ -187,7 +186,21 @@ export const useChatStore = create((set, get) => ({
             })
           };
         });
-    },  
+    },
+    
+    removeChatFromList: (chatId) => {
+        set((state) => {
+            const updatedChats = state.chats.filter(chat => chat._id !== chatId);
+            const updatedMessages = { ...state.messages };
+            delete updatedMessages[chatId];
+
+            return {
+                selectedChat: null,
+                chats: updatedChats,
+                messages: updatedMessages
+            };
+        });
+    },
 
     appendMessage: (chatId, newMessage) => {
         set((state) => {
