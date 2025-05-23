@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useChatStore } from '../stores/chatStore'
-import { ArrowRightToLine, Camera, CircleArrowLeft, CircleArrowRight, ImageUp, LogOut, SquarePen, Trash2 } from 'lucide-react';
+import { ArrowRightToLine, Camera, CircleArrowLeft, CircleArrowRight, ImageUp, LogOut, SquarePen, Trash2, UserPlus } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { formatDate } from '../utils/date';
 import toast from 'react-hot-toast';
@@ -228,6 +228,14 @@ const ChatInfoBox = () => {
           <div id='group-members' className='px-4 border-b border-base-300 mb-3'>
             <span className='text-accent text-sm'>Members</span>
             <div className='mb-5'>
+              {selectedChat.groupAdmins.includes(authUser._id) && (
+                <button 
+                  className="btn btn-block btn-primary btn-outline my-2"
+                >
+                  <UserPlus className='size-5' />
+                  Add new members
+                </button>
+              )}
               {selectedChat.users.map((user) => (
                 <button
                   key={user._id}
