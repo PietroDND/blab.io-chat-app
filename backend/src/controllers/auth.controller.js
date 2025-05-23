@@ -9,7 +9,7 @@ export const signup = async (req, res) => {
         if (!username || !fullname || !email || !password) {
             return res.status(400).json({ msg: 'All fields are required' });
         }
-        const isUsernameValidRegex = /^[a-zA-Z0-9_]{3,20}$/;
+        const isUsernameValidRegex = /^[a-zA-Z0-9._]{3,20}$/;
         if (!isUsernameValidRegex.test(username)) {
             return res.status(400).json({ msg: 'Username must be 3-20 characters long and must not include spaces or special characters' });
         }
@@ -29,7 +29,8 @@ export const signup = async (req, res) => {
             username,
             fullname,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            isAdmin: false
         });
 
         if (newUser) {
@@ -42,7 +43,8 @@ export const signup = async (req, res) => {
                 username: newUser.username,
                 fullname: newUser.fullname,
                 email: newUser.email,
-                profilePic: newUser.profilePic
+                profilePic: newUser.profilePic,
+                isAdmin: newUser.isAdmin
             });
 
         } else {

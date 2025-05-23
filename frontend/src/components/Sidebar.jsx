@@ -51,10 +51,6 @@ const Sidebar = () => {
     }
   }
 
-  const createGroupChat = () => {
-    console.log('click');
-  };
-
   if(isUsersLoading || isChatsLoading) {
     return(
       <SidebarSkeleton />
@@ -135,7 +131,7 @@ const Sidebar = () => {
                     </div>
                   </div>
                   <div className='flex justify-between items-center'>
-                    <div className='flex items-center text-sm h-6 text-accent truncate w-35'>{getLatestMessage(chat)}</div>
+                    <div className='flex items-center text-sm h-6 text-accent truncate w-37'>{getLatestMessage(chat)}</div>
                     <div 
                       className={`bg-primary text-white size-5 rounded-full p-3 text-sm justify-center items-center ${getUnreadCount(chat._id) > 0 ? 'flex' : 'hidden'}`}
                     >
