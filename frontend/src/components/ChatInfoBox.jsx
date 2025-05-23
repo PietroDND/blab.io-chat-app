@@ -1,25 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useChatStore } from '../stores/chatStore'
-import { ArrowRightToLine, Camera, CircleArrowLeft, CircleArrowRight, ImageUp, SquarePen, Trash2 } from 'lucide-react';
+import { ArrowRightToLine, Camera, CircleArrowLeft, CircleArrowRight, ImageUp, LogOut, SquarePen, Trash2 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { formatDate } from '../utils/date';
 import toast from 'react-hot-toast';
 
 const ChatInfoBox = () => {
   const { authUser } = useAuthStore();
-  const { chats, selectedChat, setShowInfoBox, editGroupChat, chatImages } = useChatStore();
+  const { chats, selectedChat, setShowInfoBox, editGroupChat, chatImages, leaveGroupChat } = useChatStore();
   const [isEditingGroupName, setIsEditingGroupName] = useState(false);
-  const [editedGroupName, setEditedGroupName] = useState(selectedChat.groupName);
+  const [editedGroupName, setEditedGroupName] = useState(selectedChat?.groupName);
   const editableRef = useRef(null);
   const dropdownRef = useRef(null);
+  const leaveGroupModalRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const getImageSrc = () => {
-    if (selectedChat.isGroupChat) {
+    if (selectedChat?.isGroupChat) {
       const targetChat = chats.find((chat) => chat._id === selectedChat._id);
       return targetChat?.groupPic || selectedChat.groupPic;
     } else {
-      return selectedChat.users.find((user) => user._id !== authUser._id).profilePic;
+      return selectedChat?.users.find((user) => user._id !== authUser._id).profilePic;
     }
   };
 
@@ -83,7 +84,11 @@ const ChatInfoBox = () => {
     }
   };
 
-  console.log(selectedChat)
+  const closeLeaveGroupModal = () => {
+    leaveGroupModalRef.current?.close();
+  };
+
+  if (!selectedChat) return null;
 
   return (
     <div className='w-1/2 border-l border-base-300 flex flex-col'>
@@ -136,7 +141,7 @@ const ChatInfoBox = () => {
 
                 {!selectedChat?.isGroupChat && (
                   <span className='font-medium text-lg px-1'>
-                    {selectedChat.users.find((user) => user._id !== authUser._id).username}
+                    {selectedChat?.users.find((user) => user._id !== authUser._id).username}
                   </span>
                 )}
 
@@ -168,8 +173,8 @@ const ChatInfoBox = () => {
                 </div>
               )}
               <span className='text-accent'>
-                {selectedChat.isGroupChat ?
-                'Group - ' + selectedChat.users.length + ' members' :
+                {selectedChat && selectedChat?.isGroupChat ?
+                'Group - ' + selectedChat?.users?.length + ' members' :
                 selectedChat.users.find((user) => user._id !== authUser._id).fullname}
               </span>
               {selectedChat.isGroupChat && (
@@ -220,7 +225,7 @@ const ChatInfoBox = () => {
           )}
         </div>
         {selectedChat.isGroupChat && (
-          <div id='group-members' className='px-4 border-b border-base-300'>
+          <div id='group-members' className='px-4 border-b border-base-300 mb-3'>
             <span className='text-accent text-sm'>Members</span>
             <div className='mb-5'>
               {selectedChat.users.map((user) => (
@@ -250,6 +255,50 @@ const ChatInfoBox = () => {
             </div>
           </div>
         )}
+        {selectedChat.isGroupChat && (
+          <div id="options" className='px-4'>
+            <button 
+              className="btn btn-block btn-soft btn-error" 
+              onClick={()=>document.getElementById('leave-chat-modal').showModal()}
+              >
+                <LogOut className='size-5' />
+                Leave group chat
+            </button>
+            <dialog id="leave-chat-modal" className="modal" ref={leaveGroupModalRef}>
+              <div className="modal-box px-10 space-y-2">
+                <h3 className="font-bold text-lg">
+                  Are you sure you want to leave "{selectedChat.groupName}"?
+                </h3>
+                <div id="modal-info" className='mb-4'>
+                  <p className='text-accent text-sm'>You will no longer be able to send or receive messages in this group, and you will lose access to previous conversations.</p>
+                  {selectedChat.groupAdmins.includes(authUser._id) && (
+                    <p className='text-accent text-sm mt-4'>Your <span className='text-warning'>admin</span> status will also be revoked.</p>
+                  )}
+                </div>
+                <div className='flex justify-end gap-1'>
+                  <button className="btn btn-ghost" onClick={closeLeaveGroupModal}>Cancel</button>
+                  <button 
+                    className="btn btn-soft btn-error" 
+                    onClick={async () => {
+                      try {
+                        await leaveGroupChat(selectedChat._id);
+                      } catch (error) {
+                        console.error('Error while trying to leave group chat: ', error.message);
+                      }
+                      closeLeaveGroupModal();
+                    }}
+                    >
+                      Leave group
+                    </button>
+                </div>
+              </div>
+              <form method="dialog" className="modal-backdrop">
+                <button>close</button>
+              </form>
+            </dialog>
+          </div>
+        )}
+
       </div>
     </div>
   )

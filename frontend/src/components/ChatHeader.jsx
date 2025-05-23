@@ -66,9 +66,11 @@ const ChatHeader = () => {
           </div>
 
           <div className='flex gap-4'>
-            <button className='cursor-pointer' onClick={() => toggleInfoBox()}>
-              <Info />
-            </button>
+            {selectedChat && (
+                <button className='cursor-pointer' onClick={() => toggleInfoBox()}>
+                    <Info />
+                </button>
+            )}
             <button className='cursor-pointer' onClick={() => {setSelectedChat(null); setSelectedUser(null)}}>
               <X />
             </button>

@@ -62,6 +62,10 @@ io.on('connection', (socket) => {
         });
     });
 
+    socket.on('leave-group-chat', (chatId) => {
+        socket.leave(chatId);
+    });
+
     socket.on('disconnect', async () => {
         console.log('User disconnected: ', socket.id);
         if (socket.userId) {

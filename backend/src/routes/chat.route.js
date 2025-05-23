@@ -1,6 +1,6 @@
 import express from 'express';
 import { protectRoute } from '../middleware/auth.middleware.js';
-import { getChats, getChatById, createChat, deleteChat, updateChat, manageChatUsers } from '../controllers/chat.controller.js';
+import { getChats, getChatById, createChat, deleteChat, updateChat, manageChatUsers, leaveGroupChat } from '../controllers/chat.controller.js';
 
 const router = express.Router();
 
@@ -11,6 +11,7 @@ router.post('/', protectRoute, createChat); //Create a chat (1-on-1 or group cha
 
 router.patch('/:chatId', protectRoute, updateChat); //Update info such as chat name, chat avatar,... (for group chats)
 router.patch('/:chatId/manage-users', protectRoute, manageChatUsers); //Add/Remove participant, Promote/Demote admins
+router.patch('/:chatId/leave-group', protectRoute, leaveGroupChat);
 
 router.delete('/:chatId', protectRoute, deleteChat); //Delete selected chat by ID
 

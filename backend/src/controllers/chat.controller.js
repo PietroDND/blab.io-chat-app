@@ -105,7 +105,7 @@ export const createChat = async (req, res) => {
 
         const chat = await Chat.create(chatData);
         await chat.populate('users', 'username profilePic');
-        await chat.populate('groupAdmins', 'username');
+        //await chat.populate('groupAdmins', 'username');
         res.status(201).json(chat);
     } catch (error) {
         console.error('Error in createChat: ', error.message);
@@ -227,7 +227,7 @@ export const updateChat = async (req, res) => {
         Object.assign(chat, updatedInfo);
         await chat.save();
         await chat.populate('users', 'username profilePic');
-        await chat.populate('groupAdmins', 'username');
+        //await chat.populate('groupAdmins', 'username');
         await chat.populate({
             path: 'latestMessage',
             populate: { path: 'senderId', select: 'username' }
@@ -236,6 +236,46 @@ export const updateChat = async (req, res) => {
         res.status(200).json(chat);
     } catch (error) {
         console.error('Error in updateChat :', error.message);
+        res.status(500).json({ msg: 'Internal Server Error' });
+    }
+};
+
+export const leaveGroupChat = async (req, res) => {
+    const currentUserId = req.user._id;
+    const { chatId } = req.params;
+
+    try {
+        const chat = await Chat.findById(chatId);
+        if (!chat) {
+            return res.status(404).json({ msg: 'Chat not found.' });
+        }
+        if (!chat.isGroupChat) {
+            return res.status(403).json({ msg: "You cannot leave a 1-on-1 chat." });
+        }
+        if (!chat.users.includes(currentUserId)) {
+            return res.status(403).json({ msg: 'You are not a member of this chat.' });
+        }
+
+        //Remove currentUser from the chat users array
+        chat.users = chat.users.filter(userId => !userId.equals(currentUserId));
+
+        //Check if the user is admin and remove it from array in case
+        const isAdmin = chat.groupAdmins.includes(currentUserId);
+        chat.groupAdmins = chat.groupAdmins.filter(adminId => !adminId.equals(currentUserId));
+
+        if (chat.users.length === 0) {
+            await chat.deleteOne();
+            return res.status(204).json({ msg: 'Chat is deleted because there was no users left.' });
+        } else {
+            if (isAdmin && chat.groupAdmins.length === 0) {
+                chat.groupAdmins.push(chat.users[0]); //Push the first of the remaining users as admin
+            }
+        }
+
+        await chat.save();
+        res.status(200).json({ msg: 'You have successfully left the chat.' });
+    } catch (error) {
+        console.error('Error in leaveChat :', error.message);
         res.status(500).json({ msg: 'Internal Server Error' });
     }
 };

@@ -101,6 +101,33 @@ export const useChatStore = create((set, get) => ({
         }
     },
 
+    leaveGroupChat: async (chatId) => {
+        try {
+            await axiosInstance.patch(`/chats/${chatId}/leave-group`);
+
+            const socket = useAuthStore.getState().socket;
+            if (!socket || !socket.connected) {
+                console.error('Socket not ready or connected.');
+                return;
+            }
+            socket.emit('leave-group-chat', chatId);
+
+            set((state) => {
+                const updatedChats = state.chats.filter(chat => chat._id !== chatId);
+                const updatedMessages = { ...state.messages };
+                delete updatedMessages[chatId];
+
+                return {
+                    selectedChat: null,
+                    chats: updatedChats,
+                    messages: updatedMessages
+                };
+            });
+        } catch (error) {
+            toast.error(error.response.data.msg || 'Failed to leave group chat');
+        }
+    },
+
     sendMessage: async (chatId, data) => {
         const { text, image } = data;
         const dataParsed ={
@@ -122,7 +149,7 @@ export const useChatStore = create((set, get) => ({
                 message: res.data
             });
         } catch (error) {
-            toast.error('Error - message not sent');
+            toast.error(error.response.data.msg);
         }
     },
 
