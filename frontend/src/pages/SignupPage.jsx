@@ -3,6 +3,7 @@ import { useAuthStore } from '../stores/authStore';
 import {IdCard, User, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AuthHeroSection from '../components/shared/AuthHeroSection'
+import logo from '../assets/blab_logo.png';
 
 const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false);
