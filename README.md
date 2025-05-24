@@ -68,3 +68,10 @@ cd blab.io
 npm install
 npm run dev
 ```
+
+## 📄 Credit
+
+This project is based on [fullstack-chat-app](https://github.com/burakorkmez/fullstack-chat-app) by [burakorkmez](https://github.com/burakorkmez).  
+The original project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+
+Significant modifications have been made, including new features, changes to core logic, and UI adjustments, to develop a customized version tailored to my own goals and use cases.
