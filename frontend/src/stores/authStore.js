@@ -17,6 +17,7 @@ export const useAuthStore = create(devtools((set, get) => ({
     socket: null,
     onlineUsers: [],
     lastSeen: {},
+    currentTheme: 'light',
 
     checkAuth: async () => {
         try {
@@ -95,6 +96,10 @@ export const useAuthStore = create(devtools((set, get) => ({
             [userId]: timestamp
           }
         }));
+    },
+
+    setCurrentTheme: (theme) => {
+        set({ currentTheme: theme });
     },
 
     connectSocket: () => {

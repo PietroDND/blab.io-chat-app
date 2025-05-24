@@ -31,3 +31,9 @@
 * {
     font-family: "Outfit", sans-serif;
 }
+
+.emoji-picker {
+    position: absolute !important;
+    right: 155px;
+    bottom: 75px;
+}
