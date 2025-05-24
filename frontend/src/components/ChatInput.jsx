@@ -9,7 +9,7 @@ import { useAuthStore } from '../stores/authStore';
 const ChatInput = () => { 
     const [text, setText] = useState('');
     const [imagePreview, setImagePreview] = useState(null);
-    const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const fileInputRef = useRef(null);
     const { currentTheme } = useAuthStore();
     const { createChat, selectedChat, setSelectedChat, sendMessage } = useChatStore();
@@ -94,7 +94,7 @@ const ChatInput = () => {
         <div className='relative'>
           <EmojiPicker 
             className='emoji-picker'
-            open={isEmojiPickerOpen}
+            open={showEmojiPicker}
             lazyLoadEmojis={false}
             theme={currentTheme}
             onEmojiClick={handleEmojiSelection}
@@ -132,8 +132,8 @@ const ChatInput = () => {
                 <button
                   type="button"
                   className={`flex btn btn-circle
-                    ${isEmojiPickerOpen ? "text-warning" : "text-zinc-500"}`}
-                  onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)}
+                    ${showEmojiPicker ? "text-warning" : "text-zinc-500"}`}
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                 >
                   <Smile size={20} />
                 </button>
