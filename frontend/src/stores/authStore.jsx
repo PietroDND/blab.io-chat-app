@@ -120,7 +120,7 @@ export const useAuthStore = create(devtools((set, get) => ({
         socket.connect();
         set({ socket });
         socket.on('connect', async () => {
-            console.log('✅ Socket connected: ', socket.id);
+            //console.log('✅ Socket connected: ', socket.id);
             socket.emit('join', authUser._id);
 
             //Fetch registered users list
@@ -228,7 +228,7 @@ export const useAuthStore = create(devtools((set, get) => ({
         });
 
         socket.on('disconnect', () => {
-            console.log('❌ Socket disconnected');
+            //console.log('❌ Socket disconnected');
             set({ onlineUsers: [] }); // reset list
         });
 
