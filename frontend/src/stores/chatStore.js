@@ -121,26 +121,15 @@ export const useChatStore = create((set, get) => ({
             const allUsers = useUserStore.getState().users;
             const addedUsers = addedUsersIds.map((id) => allUsers.find((u) => u._id === id)).filter(Boolean);
             if (addedUsers.length === 0) return;
+            get().updateMembersGroupChat(chatId, addedUsers);
 
-            set((state) => {
-              const updatedChats = state.chats.map((chat) => {
-                if (chat._id === chatId) {
-                  const newUsers = addedUsers.filter(
-                    (newUser) => !chat.users.some((u) => u._id === newUser._id)
-                  );
-
-                  return {
-                    ...chat,
-                    users: [...chat.users, ...newUsers],
-                  };
-                }
-                return chat;
-              });
-              return { chats: updatedChats };
-            });
-
-            console.log(get().chats);
-
+            const socket = useAuthStore.getState().socket;
+            if (!socket || !socket.connected) {
+                console.error('Socket not ready or connected.');
+                return;
+            }
+            const updatedChat = get().chats.find((chat) => chat._id === chatId);
+            socket.emit('add-to-chat', updatedChat, addedUsers);
         } catch (error) {
             toast.error(error.response.data.msg || 'Failed to add new members to group chat');
         }
@@ -234,6 +223,25 @@ export const useChatStore = create((set, get) => ({
                 chats: updatedChats,
                 messages: updatedMessages
             };
+        });
+    },
+
+    updateMembersGroupChat: (chatId, addedUsers) => {
+        set((state) => {
+            const updatedChats = state.chats.map((chat) => {
+              if (chat._id === chatId) {
+                const newUsers = addedUsers.filter(
+                  (newUser) => !chat.users.some((u) => u._id === newUser._id)
+                );
+
+                return {
+                  ...chat,
+                  users: [...chat.users, ...newUsers],
+                };
+              }
+              return chat;
+            });
+            return { chats: updatedChats };
         });
     },
 

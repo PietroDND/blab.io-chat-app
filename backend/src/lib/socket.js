@@ -57,7 +57,6 @@ io.on('connection', (socket) => {
             if (targetSocketId && targetSocketId !== socket.id) {
                 io.to(targetSocketId).emit('get-new-chat', chat); // emit full chat info
                 io.sockets.sockets.get(targetSocketId)?.join(chatId); // force join to room
-                //logRoomStatus(io, chatId);
             }
         });
     });
@@ -65,6 +64,17 @@ io.on('connection', (socket) => {
     socket.on('leave-group-chat', (chatId) => {
         socket.leave(chatId);
         io.to(chatId).emit('user-left-group-chat', chatId);
+    });
+
+    socket.on('add-to-chat', (chat, addedUsers) => {
+        //Make all added users join the new chat room
+        addedUsers.forEach((user) => {
+            const targetSocketId = onlineUsers.get(user._id);
+            if (targetSocketId && targetSocketId !== socket.id) {
+                io.to(targetSocketId).emit('get-new-chat', chat); // emit full chat info
+                io.sockets.sockets.get(targetSocketId)?.join(chat); // force join to room
+            }
+        });
     });
 
     socket.on('disconnect', async () => {

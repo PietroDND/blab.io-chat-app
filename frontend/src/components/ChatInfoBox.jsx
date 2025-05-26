@@ -8,13 +8,25 @@ import AddGroupMembers from './shared/AddGroupMembers';
 
 const ChatInfoBox = () => {
   const { authUser } = useAuthStore();
-  const { chats, selectedChat, setShowInfoBox, editGroupChat, chatImages, leaveGroupChat } = useChatStore();
+  const { chats, selectedChat, setSelectedChat, setShowInfoBox, editGroupChat, chatImages, leaveGroupChat } = useChatStore();
   const [isEditingGroupName, setIsEditingGroupName] = useState(false);
   const [editedGroupName, setEditedGroupName] = useState(selectedChat?.groupName);
   const editableRef = useRef(null);
   const dropdownRef = useRef(null);
   const leaveGroupModalRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (!selectedChat) return;
+
+    const updatedChat = chats.find((chat) => chat._id === selectedChat._id);
+    if (updatedChat && 
+        (updatedChat.users.length !== selectedChat.users.length ||
+         updatedChat.updatedAt !== selectedChat.updatedAt)
+    ) {
+      setSelectedChat(updatedChat);
+    }
+  }, [chats]);
 
   const getImageSrc = () => {
     if (selectedChat?.isGroupChat) {

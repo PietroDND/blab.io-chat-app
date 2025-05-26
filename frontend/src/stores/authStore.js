@@ -163,6 +163,10 @@ export const useAuthStore = create(devtools((set, get) => ({
             useChatStore.getState().getChatById(chatId);
         });
 
+        socket.on('new-chat-members', (chatId, addedUsers) => {
+            get().updateMembersGroupChat(chatId, addedUsers);
+        });
+
         socket.on('disconnect', () => {
             console.log('❌ Socket disconnected');
             set({ onlineUsers: [] }); // reset list
