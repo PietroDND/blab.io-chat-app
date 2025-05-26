@@ -48,10 +48,15 @@ It features user authentication, media uploads, theme switching, and basic profi
 - **[Major] New Group Members Not Reflected in Real Time**: This is a high-priority bug affecting group chat consistency. When a group admin adds a user to a group, existing group members must reload the page to:
   - See the new user(s) in the chat info box
   - Receive real-time messages from them
+
 - **Mobile Optimization**: The interface is not currently optimized for mobile devices and may have layout or usability issues on smaller screens.
+
 - **Chat Info Box Image Sync**: New images in the chat info box don't appear until you close and reopen the chat.
+
 - **Notification Stack**: Notifications do not disappear after being clicked, and continue to stack. This can eventually cover the entire screen if messages arrive in rapid succession.
+
 - **Chat Sorting on Update**: When the page is initially loaded, chats in the sidebar are sorted correctly. However, when new messages arrive dynamically, the order isn't updated, and newer chats can appear below inactive ones.
+
 - **Emoji Picker Theme Color Inconsistency**: The emoji picker follows the app's current theme (light/dark), but its color tones are slightly different from the app’s main theme shades.
 
 
