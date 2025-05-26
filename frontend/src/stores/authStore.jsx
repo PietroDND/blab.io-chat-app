@@ -6,6 +6,7 @@ import { devtools } from 'zustand/middleware';
 import { useChatStore } from './chatStore.js';
 import { useUserStore } from './userStore.js';
 import React from 'react';
+import { Image } from 'lucide-react';
 
 const debug = false;
 
@@ -172,9 +173,12 @@ export const useAuthStore = create(devtools((set, get) => ({
                                 chat.users.find((user) => user._id !== authUser._id).username
                               }
                             </p>
-                            <p className="mt-1 text-sm">
-                              {message.message.text}
-                            </p>
+                            <div className="mt-1 text-sm">
+                              {message.message?.image ?
+                                <div className='flex gap-1'><Image className='size-4.5'/> <p>{message.message?.text || 'Image'}</p></div> :
+                                message.message.text
+                              }
+                            </div>
                           </div>
                         </div>
                       </div>
