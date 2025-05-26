@@ -203,11 +203,11 @@ const ChatInfoBox = () => {
             <div className='mb-5'>
               <span className='text-accent mb-4 text-sm'>Shared pictures</span>
               <div className='relative flex mt-5'>
-                <div className='flex h-full absolute -left-3 items-center'>
+                <div className='flex h-full absolute -left-2 items-center'>
                   <button
-                    className='btn btn-circle'
+                    className='btn btn-circle opacity-90'
                     onClick={() => setCurrentIndex(prev => Math.max(prev - 1, 0))}
-                    disabled={currentIndex === 0}
+                    //disabled={currentIndex === 0}
                   >
                     <CircleArrowLeft className='size-8' />
                   </button>
@@ -224,11 +224,11 @@ const ChatInfoBox = () => {
                   ))}
                 </div>
 
-                <div className='flex h-full absolute -right-3 items-center'>
+                <div className='flex h-full absolute -right-2 items-center'>
                   <button
-                    className='btn btn-circle'
+                    className='btn btn-circle opacity-90'
                     onClick={() => setCurrentIndex(prev => Math.min(prev + 1, chatImages.length - 3))}
-                    disabled={currentIndex + 3 >= chatImages.length}
+                    //disabled={currentIndex + 3 >= chatImages.length}
                   >
                     <CircleArrowRight className='size-8' />
                   </button>
