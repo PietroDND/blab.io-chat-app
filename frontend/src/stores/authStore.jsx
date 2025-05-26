@@ -5,6 +5,7 @@ import { io } from 'socket.io-client';
 import { devtools } from 'zustand/middleware';
 import { useChatStore } from './chatStore.js';
 import { useUserStore } from './userStore.js';
+import React from 'react';
 
 const debug = false;
 
@@ -142,7 +143,56 @@ export const useAuthStore = create(devtools((set, get) => ({
         });
 
         socket.on('get-new-message', async (message) => {
+            if (message.message.senderId === authUser._id) return;
             const isChatOpen = useChatStore.getState().selectedChat?._id === message.chatId;
+            if (!isChatOpen) {
+                const chat = useChatStore.getState().chats.find((chat) => chat._id === message.chatId);
+                toast.custom((t) => (
+                    <div
+                      className={`${
+                        t.visible ? 'animate-enter' : 'animate-leave'
+                      } max-w-md w-full bg-base-200 shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-base-300 ring-opacity-5`}
+                    >
+                      <div 
+                        className="flex-1 w-0 p-4 cursor-pointer" 
+                        onClick={() => useChatStore.getState().setSelectedChat(chat)}
+                      >
+                        <div className="flex items-start">
+                          <div className="flex-shrink-0 pt-0.5">
+                            <img
+                              className="h-10 w-10 rounded-full"
+                              src={chat.isGroupChat ? chat.groupPic : chat.users.find((user) => user._id !== authUser._id).profilePic}
+                              alt="notification image"
+                            />
+                          </div>
+                          <div className="ml-3 flex-1">
+                            <p className="text-sm font-medium text-accent">
+                              {chat.isGroupChat ?
+                                chat.groupName :
+                                chat.users.find((user) => user._id !== authUser._id).username
+                              }
+                            </p>
+                            <p className="mt-1 text-sm">
+                              {message.message.text}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex">
+                        <button
+                          onClick={() => toast.dismiss(t.id)}
+                          className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-primary cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                    ),
+                    {
+                        duration: 5000
+                    } 
+                )
+            }
             //Mark message as read before adding to the messages store, if chat is open
             if (isChatOpen && !message.message.readBy.includes(authUser._id)) {
                 message.message.readBy.push(authUser._id);
@@ -156,7 +206,7 @@ export const useAuthStore = create(devtools((set, get) => ({
                     console.error('Failed to auto-mark message as read:', error.message);
                 });
                 useChatStore.getState().markMessagesAsReadLocally(message.chatId, authUser._id);
-            }
+            } 
         });
 
         socket.on('user-left-group-chat', (chatId) => {
