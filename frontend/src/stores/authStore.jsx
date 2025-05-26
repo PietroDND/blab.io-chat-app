@@ -9,6 +9,9 @@ import React from 'react';
 import { Image } from 'lucide-react';
 
 const debug = false;
+const SOCKET_URL = import.meta.env.MODE === 'development'
+    ? import.meta.env.VITE_BASE_URL
+    : '/';
 
 export const useAuthStore = create(devtools((set, get) => ({
     authUser: null,
@@ -108,10 +111,11 @@ export const useAuthStore = create(devtools((set, get) => ({
         const { authUser } = get();
         if (!authUser || get().socket?.connected) return;
 
-        const socket = io(import.meta.env.VITE_BASE_URL, {
+        const socket = io(SOCKET_URL, {
             query: {
-                userId: authUser._id
-            }
+                userId: authUser._id,
+            },
+            withCredentials: true
         });
         socket.connect();
         set({ socket });
