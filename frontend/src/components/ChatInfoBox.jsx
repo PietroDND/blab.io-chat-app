@@ -4,6 +4,7 @@ import { ArrowRightToLine, Camera, CircleArrowLeft, CircleArrowRight, ImageUp, L
 import { useAuthStore } from '../stores/authStore';
 import { formatDate } from '../utils/date';
 import toast from 'react-hot-toast';
+import AddGroupMembers from './shared/AddGroupMembers';
 
 const ChatInfoBox = () => {
   const { authUser } = useAuthStore();
@@ -229,12 +230,7 @@ const ChatInfoBox = () => {
             <span className='text-accent text-sm'>Members</span>
             <div className='mb-5'>
               {selectedChat.groupAdmins.includes(authUser._id) && (
-                <button 
-                  className="btn btn-block btn-primary btn-outline my-2"
-                >
-                  <UserPlus className='size-5' />
-                  Add new members
-                </button>
+                <AddGroupMembers />
               )}
               {selectedChat.users.map((user) => (
                 <button

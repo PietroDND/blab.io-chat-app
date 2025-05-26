@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { axiosInstance } from '../lib/axios.js';
 import toast from 'react-hot-toast';
 import { useAuthStore } from './authStore.js';
+import { useUserStore } from './userStore.js';
 
 export const useChatStore = create((set, get) => ({
     chats: [],
@@ -108,6 +109,40 @@ export const useChatStore = create((set, get) => ({
             get().updateChatsList(res.data);
         } catch (error) {
             toast.error(error.response.data.msg);
+        }
+    },
+
+    addMembersGroupChat: async (chatId, usersToAdd) => {
+        try {
+            const res = await axiosInstance.patch(`/chats/${chatId}/manage-users`, {usersToAdd});
+            const addedUsersIds = res.data?.changes?.added;
+
+            if (!addedUsersIds || addedUsersIds.length === 0) return;
+            const allUsers = useUserStore.getState().users;
+            const addedUsers = addedUsersIds.map((id) => allUsers.find((u) => u._id === id)).filter(Boolean);
+            if (addedUsers.length === 0) return;
+
+            set((state) => {
+              const updatedChats = state.chats.map((chat) => {
+                if (chat._id === chatId) {
+                  const newUsers = addedUsers.filter(
+                    (newUser) => !chat.users.some((u) => u._id === newUser._id)
+                  );
+
+                  return {
+                    ...chat,
+                    users: [...chat.users, ...newUsers],
+                  };
+                }
+                return chat;
+              });
+              return { chats: updatedChats };
+            });
+
+            console.log(get().chats);
+
+        } catch (error) {
+            toast.error(error.response.data.msg || 'Failed to add new members to group chat');
         }
     },
 
