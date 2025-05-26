@@ -175,8 +175,10 @@ export const useAuthStore = create(devtools((set, get) => ({
                             </p>
                             <div className="mt-1 text-sm">
                               {message.message?.image ?
-                                <div className='flex gap-1'><Image className='size-4.5'/> <p>{message.message?.text || 'Image'}</p></div> :
-                                message.message.text
+                                <div className='flex gap-1'><Image className='size-4.5'/> 
+                                    <p>{chat.isGroupChat && `${message.message.senderId.username}: `}{message.message?.text || 'Image'}</p>
+                                </div> :
+                                <p>{chat.isGroupChat && `${message.message.senderId.username}: `}{message.message.text}</p>
                               }
                             </div>
                           </div>
