@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import ChatHeader from './ChatHeader'
 import ChatInfoBox from './ChatInfoBox'
 import { useChatStore } from '../stores/chatStore';
@@ -11,6 +11,8 @@ const ChatContainer = () => {
   const { authUser } = useAuthStore();
   const { messages, getMessages, selectedChat, markMessagesAsRead, markMessagesAsReadLocally, showInfoBox, setShowInfoBox, getImages } = useChatStore();
   const { selectedUser } = useUserStore();
+  const messagesEndRef = useRef(null);
+  const isInitialLoad = useRef(true);
 
   useEffect(() => {
     setShowInfoBox(false);
@@ -18,6 +20,7 @@ const ChatContainer = () => {
 
   useEffect(() => {
     if (!selectedChat) return;
+    isInitialLoad.current = true;
 
     const fetchImages = async () => {
       try {
@@ -40,6 +43,15 @@ const ChatContainer = () => {
     loadMessagesAndMarkAsRead();
     fetchImages();
   }, [selectedChat]);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({
+        behavior: isInitialLoad.current ? 'auto' : 'smooth'
+      });
+      isInitialLoad.current = false;
+    }
+  }, [messages[selectedChat?._id]?.length]);
 
   return (
     <div className='flex flex-1'>
@@ -83,6 +95,7 @@ const ChatContainer = () => {
                 </div>
               </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
         <ChatInput />
 
