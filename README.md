@@ -32,11 +32,12 @@ It features user authentication, media uploads, theme switching, and basic profi
 ## 🔮 Roadmap
 
 - ✅ Group chats implementation
+- ✅ Toast notification system for messages
 - 🔜 Friends list (chat only with approved contacts)
 - 🔜 Group admin features (add/remove/promote/demote users)
 - 🔜 Fully responsive UI for mobile and tablet
 - 🔜 Message read receipts & typing indicators
-- 🔜 Notification system (push/web)
+- 🔜 Browser Push Notifications (Web Notifications API)
 
 ## 🔧 Environment Variables
 

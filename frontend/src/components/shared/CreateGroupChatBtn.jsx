@@ -3,16 +3,21 @@ import {
     MessagesSquare,
     ChevronDown,
     ChevronUp,
+    Smile,
   } from 'lucide-react';
   import React, { useState } from 'react';
 import { useUserStore } from '../../stores/userStore';
 import toast from 'react-hot-toast';
 import { useChatStore } from '../../stores/chatStore';
+import { useAuthStore } from '../../stores/authStore';
+import EmojiPicker from 'emoji-picker-react';
   
   
   const CreateGroupChatBtn = () => {
+    const { currentTheme } = useAuthStore();
     const { users } = useUserStore();
     const { createChat } = useChatStore();
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [groupName, setGroupName] = useState('');
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [expand, setExpand] = useState(false);
@@ -24,6 +29,10 @@ import { useChatStore } from '../../stores/chatStore';
       setSelectedUsers((prev) =>
         prev.includes(id) ? prev.filter((uid) => uid !== id) : [...prev, id]
       );
+    };
+
+    const handleEmojiSelection = (emojiData, e) => {
+      setGroupName(prev => prev + emojiData.emoji);
     };
 
     const handleImageUpload = async (e) => {
@@ -98,7 +107,15 @@ import { useChatStore } from '../../stores/chatStore';
             <h3 className="font-bold text-2xl mb-6">Create a new group chat</h3>
             <form onSubmit={handleFormSubmit} className="w-full">
               {/* Group Name */}
-              <fieldset className="fieldset mb-4">
+              <div className='flex w-full justify-center'>
+                  <EmojiPicker 
+                    open={showEmojiPicker}
+                    lazyLoadEmojis={false}
+                    theme={currentTheme}
+                    onEmojiClick={handleEmojiSelection}
+                  />
+              </div>
+              <fieldset className="fieldset mb-4 relative">
                 <legend className="fieldset-legend text-sm">
                   Insert group chat name
                 </legend>
@@ -111,6 +128,14 @@ import { useChatStore } from '../../stores/chatStore';
                     value={groupName}
                     onChange={(e) => setGroupName(e.target.value)}
                   />
+                  <button
+                  type="button"
+                  className={`flex cursor-pointer
+                    ${showEmojiPicker ? "text-warning" : "text-zinc-500"}`}
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  >
+                    <Smile size={20} />
+                  </button>
                 </label>
                 <span className={`text-error ${nameError ? 'block' : 'hidden'}`}>Please enter a name for the group chat</span>
               </fieldset>

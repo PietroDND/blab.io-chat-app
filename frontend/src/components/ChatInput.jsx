@@ -13,7 +13,7 @@ const ChatInput = () => {
     const fileInputRef = useRef(null);
     const { currentTheme } = useAuthStore();
     const { createChat, selectedChat, setSelectedChat, sendMessage } = useChatStore();
-    const { selectedUser, setSelectedUser } = useUserStore();
+    const { selectedUser } = useUserStore();
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
