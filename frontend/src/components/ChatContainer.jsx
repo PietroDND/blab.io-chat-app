@@ -54,8 +54,8 @@ const ChatContainer = () => {
   }, [messages[selectedChat?._id]?.length]);
 
   return (
-    <div className='flex flex-1'>
-      <div className='flex flex-col flex-1 h-full w-1/2'>
+    <div className='flex flex-1 h-full'>
+      <div className={`${showInfoBox ? 'hidden' : 'flex'} md:flex flex-col flex-1 h-full w-1/2`}>
         <ChatHeader />
         <div className='flex-1 overflow-x-hidden overflow-y-auto p-4 space-y-4'>
           {(messages[selectedChat?._id] || []).map((message) => (

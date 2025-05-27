@@ -104,7 +104,7 @@ const ChatInfoBox = () => {
   if (!selectedChat) return null;
 
   return (
-    <div className='w-1/2 border-l border-base-300 flex flex-col'>
+    <div className='w-full md:w-1/2 border-l border-base-300 flex flex-col'>
       <div id="header" className='h-[71px] flex items-center justify-between p-4 border-b border-base-300'>
         <h3 className='font-medium'>{selectedChat?.isGroupChat ? 'Group info' : 'Contact info'}</h3>
         <button className='btn btn-ghost' onClick={() => setShowInfoBox(false)}>
@@ -272,7 +272,7 @@ const ChatInfoBox = () => {
           </div>
         )}
         {selectedChat.isGroupChat && (
-          <div id="options" className='px-4'>
+          <div id="options" className='px-4 mb-3'>
             <button 
               className="btn btn-block btn-soft btn-error" 
               onClick={()=>document.getElementById('leave-chat-modal').showModal()}

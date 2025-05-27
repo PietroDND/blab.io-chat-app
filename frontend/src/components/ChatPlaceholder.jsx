@@ -3,7 +3,7 @@ import AppLogo from './shared/AppLogo'
 
 const ChatPlaceholder = () => {
   return (
-    <div className='flex flex-1 justify-center items-center'>
+    <div className='hidden md:flex flex-1 justify-center items-center h-full'>
         <div className='flex flex-col items-center gap-2'>
             <AppLogo animate={true}/>
             <span className='font-bold text-xl text-base-content/90'>Welcome to Blab.io!</span>

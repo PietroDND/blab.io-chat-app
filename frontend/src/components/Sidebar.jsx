@@ -58,20 +58,20 @@ const Sidebar = () => {
   }
 
   return (
-    <aside className='h-full w-20 lg:w-75 border-r border-base-300 flex flex-col transition-all duration-200'>
+    <aside className={`${selectedUser || selectedChat ? 'hidden' : 'flex flex-col'} md:flex md:flex-col h-full w-full md:w-75 md:border-r border-base-300 transition-all duration-200`}>
       <div className="join join-vertical bg-base-100">
         <div className="collapse collapse-arrow join-item border-base-300 border-b">
           <input type="radio" name="my-accordion-4" defaultChecked />
           <div className="collapse-title flex items-center gap-2 h-[70px]">
             <Users className="size-5" />
-            <span className="hidden lg:block">Contacts</span>
+            <span>Contacts</span>
           </div>
           <div className="collapse-content">
             {users.map((user) => (
               <button
                 key={user._id}
                 onClick={() => userSelection(user)}
-                className={`w-full py-2 lg:p-3 flex items-center gap-3 hover:bg-base-300 transition-colors mb-1 cursor-pointer ${selectedUser?._id === user._id ? 'bg-base-300 ring-1 ring-base-300' : ''}
+                className={`w-full py-2 p-3 flex items-center gap-3 hover:bg-base-300 transition-colors mb-1 cursor-pointer ${selectedUser?._id === user._id ? 'bg-base-300 ring-1 ring-base-300' : ''}
               `}
               >
                 <div className='relative'>
@@ -83,7 +83,7 @@ const Sidebar = () => {
                   <div aria-label="success" className={`${isUserOnline(user._id) ? 'inline-block' : 'hidden'} bg-green-400 rounded-full size-3 absolute -right-1 -bottom-1`}></div>
                 </div>
                 {/* User Info */}
-                <div className='hidden lg:block text-left flex-1 max-h-12 max-w-[73%]'>
+                <div className='text-left flex-1 max-h-12 max-w-[73%]'>
                   <div className='flex justify-between'>
                     <div className='font-medium truncate'>{user.username}</div>
                   </div>
@@ -97,7 +97,7 @@ const Sidebar = () => {
           <input type="radio" name="my-accordion-4" />
           <div className="collapse-title flex items-center gap-2 h-[70px]">
             <MessageSquareText className="size-5" />
-            <span className="hidden lg:block">Chats</span>
+            <span>Chats</span>
           </div>
           <div className="collapse-content">
             <CreateGroupChatBtn />
@@ -105,10 +105,10 @@ const Sidebar = () => {
               <button
                 key={chat._id}
                 onClick={() => {setSelectedUser(null); setSelectedChat(chat)}}
-                className={`w-full py-2 lg:p-3 flex items-center gap-3 hover:bg-base-300 transition-colors mb-1 cursor-pointer ${selectedChat?._id === chat._id ? 'bg-base-300 ring-1 ring-base-300' : ''}
+                className={`w-full py-2 p-3 flex items-center gap-3 hover:bg-base-300 transition-colors mb-1 cursor-pointer ${selectedChat?._id === chat._id ? 'bg-base-300 ring-1 ring-base-300' : ''}
               `}
               >
-                <div className=''>
+                <div>
                   <img 
                     src={chat.isGroupChat 
                       ? chat.groupPic 
@@ -119,7 +119,7 @@ const Sidebar = () => {
                   />
                 </div>
                 {/* Chat Info */}
-                <div className='hidden lg:block text-left flex-1 max-h-12 max-w-[73%]'>
+                <div className='text-left flex-1 max-h-12 max-w-[73%]'>
                   <div className='flex justify-between'>
                     <div className="flex justify-between items-center w-full">
                       <div className='font-medium truncate'>{
