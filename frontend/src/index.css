@@ -37,3 +37,12 @@
     right: 155px;
     bottom: 75px;
 }
+
+@media only screen and (max-width: 768px) {
+    .emoji-picker {
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80vw !important;
+        height: 400px !important;
+    }
+}

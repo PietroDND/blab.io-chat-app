@@ -7,14 +7,14 @@ const SidebarSkeleton = () => {
 
   return (
     <aside
-        className="h-full w-20 lg:w-72 border-r border-base-300 
+        className="h-full w-full md:w-75 md:border-r border-base-300 
         flex flex-col transition-all duration-200"
     >
         <div className="w-full collapse collapse-arrow bg-base-100 border-b border-base-300 max-h-[80%]">
         <input type="radio" name="my-accordion-2" defaultChecked />
         <div className="flex items-center gap-2 collapse-title">
             <Users className="size-5" />
-            <span className="hidden lg:block">Contacts</span>
+            <span>Contacts</span>
         </div>
         <div className="collapse-content w-full overflow-y-auto">
             <div className="overflow-y-auto w-full py-3">
@@ -26,7 +26,7 @@ const SidebarSkeleton = () => {
                         </div>
 
                         {/* User info skeleton - only visible on larger screens */}
-                        <div className="hidden lg:block text-left min-w-0 flex-1">
+                        <div className="text-left min-w-0 flex-1">
                             <div className='flex justify-between'>
                                 <div className="skeleton h-3 w-32 mb-2" />
                                 <div className="skeleton h-3 w-6 mb-2" />
@@ -43,7 +43,7 @@ const SidebarSkeleton = () => {
         <input type="radio" name="my-accordion-2" />
         <div className="flex items-center gap-2 collapse-title">
           <MessageSquareText className='size-5' />
-          <span className="hidden lg:block">Chats</span>
+          <span>Chats</span>
         </div>
         <div className="collapse-content w-full overflow-y-auto">
             <div className="overflow-y-auto w-full py-3">
@@ -55,7 +55,7 @@ const SidebarSkeleton = () => {
                         </div>
 
                         {/* User info skeleton - only visible on larger screens */}
-                        <div className="hidden lg:block text-left min-w-0 flex-1">
+                        <div className="text-left min-w-0 flex-1">
                             <div className='flex justify-between'>
                                 <div className="skeleton h-3 w-32 mb-2" />
                                 <div className="skeleton h-3 w-6 mb-2" />
