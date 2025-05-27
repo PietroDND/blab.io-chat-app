@@ -73,7 +73,7 @@ io.on('connection', (socket) => {
             const targetSocketId = onlineUsers.get(user._id);
             if (targetSocketId && targetSocketId !== socket.id) {
                 io.to(targetSocketId).emit('get-new-chat', chat); // emit full chat info
-                io.sockets.sockets.get(targetSocketId)?.join(chat); // force join to room
+                io.sockets.sockets.get(targetSocketId)?.join(chat._id); // force join to room
             }
         });
     });
