@@ -6,9 +6,7 @@ A real-time chat application built with the MERN stack.
 ## 🚀 About the Project
 
 **Blab.io** is a real-time chat platform developed using the **MERN stack** (MongoDB, Express.js, React, Node.js). It enables users to engage in one-on-one or group conversations with real-time updates powered by **Socket.IO**.  
-It features user authentication, media uploads, theme switching, and basic profile management — with many more features i'm planning to implement soon.
-
-**Try it live:** [https://blab-io-chat-app.onrender.com/](https://blab-io-chat-app.onrender.com/)
+It features user authentication, media uploads, theme switching, and basic profile management, with many more features i'm planning to implement soon.
 
 ## 📸 Screenshots
 
